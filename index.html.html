@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ปฏิทินการเข้า Site งาน</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,sans-serif;background:#f1f5f9;color:#1e293b;padding:16px}
+.wrap{max-width:1200px;margin:0 auto}
+header{background:linear-gradient(135deg,#1e40af,#0891b2);color:#fff;padding:20px 24px;border-radius:14px;margin-bottom:16px}
+header h1{font-size:22px}header p{opacity:.85;font-size:13px;margin-top:4px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+button{border:0;border-radius:9px;padding:9px 14px;font-size:14px;cursor:pointer;font-family:inherit}
+.primary{background:#1e40af;color:#fff}.ghost{background:#fff;border:1px solid #cbd5e1}
+.danger{background:#fee2e2;color:#b91c1c}
+select,input,textarea{padding:9px;border:1px solid #cbd5e1;border-radius:9px;font-family:inherit;font-size:14px;width:100%;background:#fff}
+.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.nav h2{font-size:18px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{text-align:center;font-size:12px;font-weight:700;color:#64748b;padding:6px 0}
+.day{min-height:96px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:5px;cursor:pointer;transition:.15s}
+.day:hover{border-color:#1e40af;background:#eff6ff}
+.day.off{opacity:.4}.day.today{border:2px solid #0891b2;background:#ecfeff}
+.dnum{font-size:12px;font-weight:700;color:#475569;margin-bottom:3px}
+.ev{font-size:11px;padding:3px 5px;border-radius:5px;margin-bottom:3px;color:#fff;line-height:1.3;overflow:hidden}
+.s1{background:#64748b}.s2{background:#f59e0b}.s3{background:#16a34a}.s4{background:#dc2626}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f1f5f9;padding:9px;text-align:left;font-size:12px;color:#475569;white-space:nowrap}
+td{padding:9px;border-top:1px solid #e2e8f0;vertical-align:top}
+tr:hover td{background:#f8fafc}
+.tag{padding:2px 8px;border-radius:20px;font-size:11px;color:#fff;white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:#fff;border-radius:12px;padding:14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat b{display:block;font-size:26px;color:#1e40af}.stat span{font-size:12px;color:#64748b}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.on{display:flex}
+.box{background:#fff;border-radius:16px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4px}
+#ro{background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:9px;font-size:13px;margin-bottom:12px;display:none}
+@media(max-width:640px){.day{min-height:64px}.ev{font-size:9px}.grid2{grid-template-columns:1fr}}
+@media print{.bar,.nav button,header{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>📅 ปฏิทินการเข้า Site งาน</h1>
+  <p>ข้อมูลส่วนกลางบน Google Sheets — ทีมทุกคนเห็นและแก้ไขร่วมกันได้</p>
+</header>
+
+<div id="ro"></div>
+<div class="stats" id="stats"></div>
+
+<div class="bar">
+  <button class="primary" onclick="openForm()">+ เพิ่มรายการ</button>
+  <button class="ghost" onclick="pull()">🔄 รีเฟรช</button>
+  <button class="ghost" onclick="share()">🔗 คัดลอกลิงก์</button>
+  <button class="ghost" onclick="expCSV()">⬇️ CSV</button>
+  <button class="ghost" onclick="window.print()">🖨️ พิมพ์</button>
+</div>
+
+<div class="bar">
+  <select id="fP" onchange="draw()" style="max-width:200px"><option value="">— ทุก Project —</option></select>
+  <select id="fS" onchange="draw()" style="max-width:180px"><option value="">— ทุก Site —</option></select>
+  <select id="fL" onchange="draw()" style="max-width:180px"><option value="">— ทุกหัวหน้าทีม —</option></select>
+</div>
+
+<div class="card">
+  <div class="nav">
+    <button class="ghost" onclick="mv(-1)">‹ ก่อนหน้า</button>
+    <h2 id="title"></h2>
+    <button class="ghost" onclick="mv(1)">ถัดไป ›</button>
+  </div>
+  <div class="cal" id="cal"></div>
+</div>
+
+<div class="card">
+  <h2 style="font-size:16px;margin-bottom:10px">📋 รายการทั้งหมดในเดือนนี้</h2>
+  <div style="overflow-x:auto"><table id="tb"></table></div>
+</div>
+</div>
+
+<div class="modal" id="modal">
+ <div class="box">
+  <h2 style="font-size:18px;margin-bottom:6px" id="mTitle">เพิ่มรายการเข้า Site</h2>
+  <div class="grid2">
+    <div><label>วันที่ *</label><input type="date" id="f_date"></div>
+    <div><label>สถานะ</label><select id="f_status">
+      <option>วางแผน</option><option>กำลังดำเนินการ</option><option>เสร็จสิ้น</option><option>เลื่อน</option>
+    </select></div>
+    <div><label>เวลาเข้า</label><input type="time" id="f_in" value="08:30"></div>
+    <div><label>เวลาออก</label><input type="time" id="f_out" value="17:00"></div>
+  </div>
+  <label>ชื่อ Project *</label><input id="f_proj" placeholder="เช่น ระบบไฟฟ้าโรงงาน A">
+  <div class="grid2">
+    <div><label>ชื่อ Site *</label><input id="f_site" placeholder="เช่น Site BKK-01"></div>
+    <div><label>หัวหน้าทีม *</label><input id="f_lead" placeholder="เช่น คุณสมชาย"></div>
+    <div><label>จำนวนทีม (คน)</label><input type="number" id="f_num" value="1" min="1"></div>
+    <div><label>ประเภทงาน</label><select id="f_type">
+      <option>ติดตั้ง</option><option>ตรวจสอบ</option><option>ซ่อมบำรุง</option><option>สำรวจ</option><option>อื่นๆ</option>
+    </select></div>
+  </div>
+  <label>หมายเหตุ</label><textarea id="f_note" rows="2"></textarea>
+  <div class="bar" style="margin-top:16px;justify-content:flex-end">
+    <button class="danger" id="btnDel" onclick="del()" style="display:none">ลบ</button>
+    <button class="ghost" onclick="closeForm()">ยกเลิก</button>
+    <button class="primary" onclick="save()">บันทึก</button>
+  </div>
+ </div>
+</div>
+
+<script>
+/* ============ ตั้งค่า ============ */
+var API = 'https://script.google.com/macros/s/AKfycbyqGs1aJdwZN21m357fzmCrR4Ei3lNf8EfB1dy5zxxr2ESoqkdzaX7bevqs9oJjCCQRVg/exec';
+var TOKEN = 'mySecret2026';   /* ต้องตรงกับใน Apps Script เป๊ะๆ */
+
+/* ============ ตัวแปรระบบ ============ */
+var DOW = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+var MON = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+var SC = {'วางแผน':'s1','กำลังดำเนินการ':'s2','เสร็จสิ้น':'s3','เลื่อน':'s4'};
+var SH = {'วางแผน':'#64748b','กำลังดำเนินการ':'#f59e0b','เสร็จสิ้น':'#16a34a','เลื่อน':'#dc2626'};
+var data = [], cur = new Date(), editId = null, busy = false;
+
+var ME = localStorage.getItem('myName');
+if (!ME) { ME = prompt('ใส่ชื่อคุณ (แสดงว่าใครแก้ไขล่าสุด):') || 'ไม่ระบุ'; localStorage.setItem('myName', ME); }
+
+function msg(text, show) {
+  var el = document.getElementById('ro');
+  el.textContent = text || '';
+  el.style.display = show ? 'block' : 'none';
+}
+
+/* ============ เชื่อมต่อ Google Sheets ============ */
+function pull(silent) {
+  if (!silent) msg('⏳ กำลังโหลดข้อมูลจากส่วนกลาง...', true);
+  busy = true;
+  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&t=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j.ok) throw new Error(j.error);
+      data = j.data;
+      msg('', false);
+      draw();
+    })
+    .catch(function (e) {
+      msg('⚠️ เชื่อมต่อไม่สำเร็จ: ' + e.message + ' — กด 🔄 รีเฟรชเพื่อลองใหม่', true);
+    })
+    .then(function () { busy = false; });
+}
+
+function push(action, payload) {
+  msg('💾 กำลังบันทึกลงส่วนกลาง...', true);
+  busy = true;
+  var body = { token: TOKEN, action: action };
+  for (var k in payload) body[k] = payload[k];
+  fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(body)
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j.ok) throw new Error(j.error);
+      data = j.data;
+      msg('', false);
+      draw();
+    })
+    .catch(function (e) {
+      msg('⚠️ บันทึกไม่สำเร็จ: ' + e.message, true);
+      alert('บันทึกไม่สำเร็จ: ' + e.message);
+    })
+    .then(function () { busy = false; });
+}
+
+function uid() { return Date.now() + '' + Math.floor(Math.random() * 999); }
+
+/* ============ ฟิลเตอร์ ============ */
+function filtered() {
+  var p = fP.value, s = fS.value, l = fL.value;
+  return data.filter(function (e) {
+    return (!p || e.proj === p) && (!s || e.site === s) && (!l || e.lead === l);
+  });
+}
+function fillFilters() {
+  [['fP','proj'],['fS','site'],['fL','lead']].forEach(function (pair) {
+    var el = document.getElementById(pair[0]), v = el.value;
+    var seen = {}, opts = [];
+    data.forEach(function (e) {
+      var x = e[pair[1]];
+      if (x && !seen[x]) { seen[x] = 1; opts.push(x); }
+    });
+    opts.sort();
+    el.innerHTML = el.options[0].outerHTML + opts.map(function (o) {
+      return '<option' + (o === v ? ' selected' : '') + '>' + o + '</option>';
+    }).join('');
+  });
+}
+function mv(n) { cur.setMonth(cur.getMonth() + n); draw(); }
+
+/* ============ วาดหน้าจอ ============ */
+function draw() {
+  var y = cur.getFullYear(), m = cur.getMonth();
+  title.textContent = MON[m] + ' ' + (y + 543);
+  var start = (new Date(y, m, 1).getDay() + 6) % 7;
+  var days = new Date(y, m + 1, 0).getDate();
+  var prev = new Date(y, m, 0).getDate();
+  var ev = filtered(), today = new Date().toDateString();
+
+  var h = DOW.map(function (d) { return '<div class="dow">' + d + '</div>'; }).join('');
+  for (var i = start - 1; i >= 0; i--) h += '<div class="day off"><div class="dnum">' + (prev - i) + '</div></div>';
+  for (var d = 1; d <= days; d++) {
+    var ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    var list = ev.filter(function (e) { return e.date === ds; });
+    var t = new Date(y, m, d).toDateString() === today ? ' today' : '';
+    h += '<div class="day' + t + '" onclick="openForm(\'' + ds + '\')"><div class="dnum">' + d + '</div>' +
+      list.map(function (e) {
+        return '<div class="ev ' + (SC[e.status] || 's1') + '" onclick="event.stopPropagation();openForm(null,\'' + e.id + '\')"><b>' + e.site + '</b><br>' + e.lead + '</div>';
+      }).join('') + '</div>';
+  }
+  var tail = (7 - ((start + days) % 7)) % 7;
+  for (var j = 1; j <= tail; j++) h += '<div class="day off"><div class="dnum">' + j + '</div></div>';
+  cal.innerHTML = h;
+
+  var mo = ev.filter(function (e) {
+    var p = e.date.split('-');
+    return +p[0] === y && +p[1] === m + 1;
+  }).sort(function (a, b) { return a.date.localeCompare(b.date); });
+
+  tb.innerHTML = '<tr><th>วันที่</th><th>เวลา</th><th>Project</th><th>Site</th><th>หัวหน้าทีม</th><th>ทีม</th><th>ประเภท</th><th>สถานะ</th><th>หมายเหตุ</th><th>แก้ไขโดย</th><th></th></tr>' +
+    (mo.length ? mo.map(function (e) {
+      return '<tr><td>' + e.date.split('-').reverse().join('/') + '</td><td>' + (e.tin || '-') + '–' + (e.tout || '-') + '</td>' +
+        '<td>' + e.proj + '</td><td><b>' + e.site + '</b></td><td>' + e.lead + '</td><td>' + (e.num || '-') + '</td><td>' + (e.type || '-') + '</td>' +
+        '<td><span class="tag" style="background:' + SH[e.status] + '">' + e.status + '</span></td><td>' + (e.note || '-') + '</td>' +
+        '<td style="font-size:11px;color:#64748b">' + (e.updatedBy || '-') + '</td>' +
+        '<td><button class="ghost" style="padding:4px 9px" onclick="openForm(null,\'' + e.id + '\')">แก้ไข</button></td></tr>';
+    }).join('') : '<tr><td colspan="11" style="text-align:center;color:#94a3b8;padding:26px">ยังไม่มีรายการในเดือนนี้</td></tr>');
+
+  var uSite = {}, uLead = {};
+  ev.forEach(function (e) { uSite[e.site] = 1; uLead[e.lead] = 1; });
+  stats.innerHTML = [
+    ['ทั้งหมด', ev.length],
+    ['เสร็จสิ้น', ev.filter(function (e) { return e.status === 'เสร็จสิ้น'; }).length],
+    ['กำลังดำเนินการ', ev.filter(function (e) { return e.status === 'กำลังดำเนินการ'; }).length],
+    ['Site ทั้งหมด', Object.keys(uSite).length],
+    ['หัวหน้าทีม', Object.keys(uLead).length]
+  ].map(function (s) { return '<div class="stat"><b>' + s[1] + '</b><span>' + s[0] + '</span></div>'; }).join('');
+
+  fillFilters();
+}
+
+/* ============ ฟอร์ม ============ */
+function openForm(date, id) {
+  editId = id || null;
+  btnDel.style.display = id ? 'inline-block' : 'none';
+  mTitle.textContent = id ? 'แก้ไขรายการ' : 'เพิ่มรายการเข้า Site';
+  var e = null;
+  if (id) { for (var i = 0; i < data.length; i++) if (data[i].id === id) e = data[i]; }
+  f_date.value = e ? e.date : (date || new Date().toISOString().slice(0, 10));
+  f_in.value = e ? e.tin : '08:30';
+  f_out.value = e ? e.tout : '17:00';
+  f_proj.value = e ? e.proj : '';
+  f_site.value = e ? e.site : '';
+  f_lead.value = e ? e.lead : '';
+  f_num.value = e ? e.num : 1;
+  f_type.value = e ? e.type : 'ติดตั้ง';
+  f_status.value = e ? e.status : 'วางแผน';
+  f_note.value = e ? e.note : '';
+  modal.classList.add('on');
+}
+function closeForm() { modal.classList.remove('on'); }
+
+function save() {
+  if (busy) return;
+  if (!f_date.value || !f_proj.value.trim() || !f_site.value.trim() || !f_lead.value.trim()) {
+    alert('กรุณากรอก วันที่ / Project / Site / หัวหน้าทีม');
+    return;
+  }
+  var row = {
+    id: editId || uid(),
+    date: f_date.value, tin: f_in.value, tout: f_out.value,
+    proj: f_proj.value.trim(), site: f_site.value.trim(), lead: f_lead.value.trim(),
+    num: f_num.value, type: f_type.value, status: f_status.value, note: f_note.value.trim(),
+    updatedBy: ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
+  };
+  closeForm();
+  push('save', { row: row });
+}
+
+function del() {
+  if (!confirm('ลบรายการนี้? (ทุกคนในทีมจะเห็นผล)')) return;
+  var id = editId;
+  closeForm();
+  push('delete', { id: id });
+}
+
+/* ============ ส่งออก / แชร์ ============ */
+function share() {
+  var link = location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function () {
+      alert('✅ คัดลอกลิงก์แล้ว — ทุกคนที่เปิดลิงก์นี้เห็นข้อมูลชุดเดียวกัน');
+    });
+  } else { prompt('คัดลอกลิงก์นี้:', link); }
+}
+
+function expCSV() {
+  var H = ['วันที่','เวลาเข้า','เวลาออก','Project','Site','หัวหน้าทีม','จำนวนทีม','ประเภท','สถานะ','หมายเหตุ','แก้ไขโดย'];
+  var rows = data.map(function (e) {
+    return [e.date, e.tin, e.tout, e.proj, e.site, e.lead, e.num, e.type, e.status, e.note, e.updatedBy];
+  });
+  var csv = '\uFEFF' + [H].concat(rows).map(function (r) {
+    return r.map(function (c) { return '"' + (c == null ? '' : String(c)).replace(/"/g, '""') + '"'; }).join(',');
+  }).join('\n');
+  var a = document.createElement('a');
+  a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'site-visits.csv';
+  a.click();
+}
+
+/* ============ เริ่มทำงาน + ซิงก์อัตโนมัติ ============ */
+draw();
+pull();
+setInterval(function () {
+  if (!busy && !modal.classList.contains('on')) pull(true);
+}, 20000);
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden && !busy) pull(true);
+});
+</script>
+</body>
+</html>
