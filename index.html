@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ปฏิทินการเข้า Site งาน</title>
+<title>Calendar All Project</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Kanit', sans-serif;background:#f1f5f9;color:#1e293b;padding:16px}
@@ -47,7 +47,7 @@ label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4
 <body>
 <div class="wrap">
 <header>
-  <h1>📅 ปฏิทินการเข้า Site งาน</h1>
+  <h1>📅 Calendar All Project</h1>
   <p>ข้อมูลส่วนกลางบน Google Sheets</p>
 </header>
 
@@ -63,9 +63,9 @@ label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4
 </div>
 
 <div class="bar">
-  <select id="fP" onchange="draw()" style="max-width:200px"><option value="">— ทุก Project —</option></select>
-  <select id="fS" onchange="draw()" style="max-width:180px"><option value="">— ทุก Site —</option></select>
-  <select id="fL" onchange="draw()" style="max-width:180px"><option value="">— ทุกหัวหน้าทีม —</option></select>
+  <select id="fP" onchange="draw()" style="max-width:200px"><option value="">— All Project —</option></select>
+  <select id="fS" onchange="draw()" style="max-width:180px"><option value="">— All Site —</option></select>
+  <select id="fL" onchange="draw()" style="max-width:180px"><option value="">— All Team —</option></select>
 </div>
 
 <div class="card">
@@ -94,9 +94,9 @@ label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4
     <div><label>เวลาเข้า</label><input type="time" id="f_in" value="08:30"></div>
     <div><label>เวลาออก</label><input type="time" id="f_out" value="17:00"></div>
   </div>
-  <label>ชื่อ Project *</label><input id="f_proj" placeholder="เช่น ระบบไฟฟ้าโรงงาน A">
+  <label>ชื่อ Project *</label><input id="f_proj" placeholder="เช่น The Flash">
   <div class="grid2">
-    <div><label>ชื่อ Site *</label><input id="f_site" placeholder="เช่น Site BKK-01"></div>
+    <div><label>ชื่อ Site *</label><input id="f_site" placeholder="เช่น Site ABC1234"></div>
     <div><label>หัวหน้าทีม *</label><input id="f_lead" placeholder="เช่น คุณสมชาย"></div>
     <div><label>จำนวนทีม (คน)</label><input type="number" id="f_num" value="1" min="1"></div>
     <div><label>ประเภทงาน</label><select id="f_type">
@@ -301,7 +301,7 @@ function share() {
   var link = location.href;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(link).then(function () {
-      alert('✅ คัดลอกลิงก์แล้ว — ทุกคนที่เปิดลิงก์นี้เห็นข้อมูลชุดเดียวกัน');
+      alert('✅ คัดลอกลิงก์แล้ว');
     });
   } else { prompt('คัดลอกลิงก์นี้:', link); }
 }
