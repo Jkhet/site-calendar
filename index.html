@@ -50,7 +50,7 @@ tr:hover td{background:#f8fafc}
 label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4px}
 #ro{background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:9px;font-size:13px;margin-bottom:12px;display:none}
 @media(max-width:640px){.day{min-height:64px}.ev{font-size:9px}.grid2{grid-template-columns:1fr}}
-@media print{.bar,.nav button,header{display:none}}
+@media print{.bar,.nav button,header{display:none}#tableCard{display:block !important}}
 </style>
 </head>
 <body>
@@ -74,6 +74,7 @@ label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4
   <button class="ghost" onclick="share()">🔗 คัดลอกลิงก์</button>
   <button class="ghost" onclick="expCSV()">⬇️ CSV</button>
   <button class="ghost" onclick="window.print()">🖨️ พิมพ์</button>
+  <button class="ghost" id="btnTable" onclick="toggleTable()">📋 สรุปรายการ</button>
 </div>
 
 <div class="bar">
@@ -91,7 +92,7 @@ label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4
   <div class="cal" id="cal"></div>
 </div>
 
-<div class="card">
+<div class="card" id="tableCard" style="display:none">
   <h2 style="font-size:16px;margin-bottom:10px">📋 รายการทั้งหมดในเดือนนี้</h2>
   <div style="overflow-x:auto"><table id="tb"></table></div>
 </div>
@@ -273,6 +274,16 @@ function fillFilters() {
   });
 }
 function mv(n) { cur.setMonth(cur.getMonth() + n); draw(); }
+
+/* ============ ย่อ/ขยาย การ์ดรายการทั้งหมดในเดือนนี้ (ซ่อนไว้เป็นค่าเริ่มต้น กันหน้าจอรก) ============ */
+function toggleTable() {
+  var card = document.getElementById('tableCard');
+  var btn = document.getElementById('btnTable');
+  var show = card.style.display === 'none';
+  card.style.display = show ? '' : 'none';
+  btn.textContent = show ? '📋 ซ่อนรายการ' : '📋 สรุปรายการ';
+  if (show) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 /* ============ วาดหน้าจอ ============ */
 function draw() {
