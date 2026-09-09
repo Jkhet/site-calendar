@@ -8,8 +8,17 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Kanit', sans-serif;background:#f1f5f9;color:#1e293b;padding:16px}
 .wrap{max-width:1200px;margin:0 auto}
-header{background:linear-gradient(135deg,#1e40af,#0891b2);color:#fff;padding:20px 24px;border-radius:14px;margin-bottom:16px}
+header{position:relative;background:linear-gradient(135deg,#1e40af,#0891b2);color:#fff;padding:20px 24px;border-radius:14px;margin-bottom:16px}
 header h1{font-size:22px}header p{opacity:.85;font-size:13px;margin-top:4px}
+.presence{position:absolute;top:14px;right:18px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;user-select:none}
+.presence:hover{background:rgba(255,255,255,.26)}
+.presence .dot{width:9px;height:9px;border-radius:50%;background:#94a3b8;flex-shrink:0}
+.presence .dot.on{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.35)}
+.presence .dot.off{background:#ef4444}
+.presence-pop{position:absolute;top:130%;right:0;background:#fff;color:#1e293b;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.2);padding:8px 12px;font-size:12px;min-width:130px;max-height:200px;overflow:auto;display:none;z-index:60}
+.presence-pop.show{display:block}
+.presence-pop div{padding:3px 0;white-space:nowrap}
+@media(max-width:640px){.presence{top:12px;right:12px;padding:5px 10px;font-size:11px}}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
 button{border:0;border-radius:9px;padding:9px 14px;font-size:14px;cursor:pointer;font-family:inherit}
 .primary{background:#1e40af;color:#fff}.ghost{background:#fff;border:1px solid #cbd5e1}
@@ -49,6 +58,11 @@ label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4
 <header>
   <h1>📅 Calendar All Project</h1>
   <p>ข้อมูลส่วนกลางบน Google Sheets</p>
+  <div class="presence" id="presenceBox" onclick="togglePresence(event)">
+    <span class="dot" id="presenceDot"></span>
+    <span id="presenceCount">-</span>
+    <div class="presence-pop" id="presencePop"></div>
+  </div>
 </header>
 
 <div id="ro"></div>
@@ -203,6 +217,39 @@ function push(action, payload) {
 }
 
 function uid() { return Date.now() + '' + Math.floor(Math.random() * 999); }
+
+/* ============ สถานะออนไลน์ (ping ไป Apps Script ทุก 15 วิ, cache หมดอายุถ้าไม่ ping ต่อ) ============ */
+function pingPresence() {
+  fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ token: TOKEN, action: 'ping', name: ME })
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (j) { if (j.ok) renderPresence(j.online || []); })
+    .catch(function () { /* เงียบไว้ ไม่รบกวนการทำงานหลัก */ });
+}
+
+function renderPresence(names) {
+  var dot = document.getElementById('presenceDot');
+  var count = document.getElementById('presenceCount');
+  var pop = document.getElementById('presencePop');
+  var n = names.length;
+  count.textContent = n + ' คนออนไลน์';
+  dot.className = 'dot ' + (n > 0 ? 'on' : 'off');
+  pop.innerHTML = n
+    ? names.map(function (nm) { return '<div>🟢 ' + esc(nm) + '</div>'; }).join('')
+    : '<div style="opacity:.7">ไม่มีใครออนไลน์</div>';
+}
+
+function togglePresence(ev) {
+  ev.stopPropagation();
+  document.getElementById('presencePop').classList.toggle('show');
+}
+document.addEventListener('click', function (ev) {
+  var box = document.getElementById('presenceBox');
+  if (box && !box.contains(ev.target)) document.getElementById('presencePop').classList.remove('show');
+});
 
 /* ============ ฟิลเตอร์ ============ */
 function filtered() {
@@ -387,11 +434,16 @@ function expCSV() {
 /* ============ เริ่มทำงาน + ซิงก์อัตโนมัติ ============ */
 draw();
 pull();
+pingPresence();
 setInterval(function () {
   if (!busy && !modal.classList.contains('on')) pull(true);
 }, 20000);
+setInterval(pingPresence, 15000);
 document.addEventListener('visibilitychange', function () {
-  if (!document.hidden && !busy) pull(true);
+  if (!document.hidden) {
+    pingPresence();
+    if (!busy) pull(true);
+  }
 });
 </script>
 </body>
