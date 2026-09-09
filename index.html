@@ -115,14 +115,20 @@ label{font-size:12px;font-weight:600;color:#475569;display:block;margin:10px 0 4
 <script>
 /* ============ ตั้งค่า ============ */
 var API = 'https://script.google.com/macros/s/AKfycbyqGs1aJdwZN21m357fzmCrR4Ei3lNf8EfB1dy5zxxr2ESoqkdzaX7bevqs9oJjCCQRVg/exec';
-var TOKEN = 'mySecret2026';   /* ต้องตรงกับใน Apps Script เป๊ะๆ */
+var TOKEN = 'mySecret2026';   /* ต้องตรงกับ TOKEN ใน Apps Script (SiteVisitDB.gs) เป๊ะๆ */
 
 /* ============ ตัวแปรระบบ ============ */
 var DOW = ['จ','อ','พ','พฤ','ศ','ส','อา'];
 var MON = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 var SC = {'วางแผน':'s1','กำลังดำเนินการ':'s2','เสร็จสิ้น':'s3','เลื่อน':'s4'};
 var SH = {'วางแผน':'#64748b','กำลังดำเนินการ':'#f59e0b','เสร็จสิ้น':'#16a34a','เลื่อน':'#dc2626'};
-var data = [], cur = new Date(), editId = null, busy = false, editSnapshot = null;
+var data = [], editId = null, busy = false, editSnapshot = null;
+
+/* ตัวชี้เดือนที่กำลังดู — ล็อกไว้ที่วันที่ 1 เสมอ กัน setMonth() ไหลข้ามเดือน
+   (เช่น ถ้าวันนี้คือ 31 ม.ค. แล้วเก็บ cur เป็นวันที่ 31 เต็มๆ พอ setMonth ไปกุมภาพันธ์
+   ซึ่งไม่มีวันที่ 31 มันจะไหลไปมีนาคมแทน ต้องล็อก day=1 ก่อนเสมอ) */
+var cur = new Date();
+cur.setDate(1);
 
 var ME = localStorage.getItem('myName');
 if (!ME) { ME = prompt('ใส่ชื่อคุณ (แสดงว่าใครแก้ไขล่าสุด):') || 'ไม่ระบุ'; localStorage.setItem('myName', ME); }
