@@ -25,6 +25,14 @@ header p{opacity:.82;font-size:12.5px;font-weight:300;letter-spacing:.2px;margin
 .presence-pop.show{display:block}
 .presence-pop div{padding:3px 0;white-space:nowrap}
 @media(max-width:640px){.presence{top:12px;right:12px;padding:5px 10px;font-size:11px}}
+.fab{display:none;position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:50%;background:var(--navy);color:#fff;font-size:26px;line-height:56px;text-align:center;box-shadow:0 6px 16px rgba(9,20,19,.4);z-index:40;padding:0}
+.fab:hover{background:var(--navy-dark)}
+@media(max-width:640px){.fab{display:block}}
+.queue-badge{background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;display:none}
+.repeat-box{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:8px;display:none}
+.history{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:none}
+.history .h-row{font-size:12px;padding:4px 0;border-bottom:1px dashed var(--line);color:var(--muted)}
+.history .h-row b{color:var(--ink)}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 button{border:0;border-radius:8px;padding:8px 14px;font-size:13.5px;font-weight:500;letter-spacing:.2px;cursor:pointer;font-family:inherit;transition:background .15s ease}
 .primary{background:var(--navy);color:#fff}.primary:hover{background:var(--navy-dark)}
@@ -88,9 +96,11 @@ label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);di
   <button class="ghost" onclick="expCSV()">⬇️ CSV</button>
   <button class="ghost" onclick="window.print()">🖨️ พิมพ์</button>
   <button class="ghost" id="btnTable" onclick="toggleTable()">📋 สรุปรายการ</button>
+  <span class="queue-badge" id="queueBadge"></span>
 </div>
 
 <div class="bar">
+  <input id="fQ" type="text" placeholder="🔍 ค้นหา site / project / หัวหน้าทีม / หมายเหตุ" oninput="draw()" style="max-width:280px">
   <select id="fP" onchange="draw()" style="max-width:200px"><option value="">— All Project —</option></select>
   <select id="fS" onchange="draw()" style="max-width:180px"><option value="">— All Site —</option></select>
   <select id="fL" onchange="draw()" style="max-width:180px"><option value="">— All Team —</option></select>
@@ -110,6 +120,8 @@ label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);di
   <div style="overflow-x:auto"><table id="tb"></table></div>
 </div>
 </div>
+
+<button class="fab" onclick="openForm()" aria-label="เพิ่มรายการ">+</button>
 
 <div class="modal" id="modal">
  <div class="box">
@@ -132,7 +144,31 @@ label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);di
     </select></div>
   </div>
   <label>หมายเหตุ</label><textarea id="f_note" rows="2"></textarea>
+
+  <div id="repeatWrap">
+    <label style="display:flex;align-items:center;gap:6px;margin-top:14px;cursor:pointer">
+      <input type="checkbox" id="f_repeat" onchange="repeatBox.style.display=f_repeat.checked?'block':'none'" style="width:auto">
+      ตั้งเป็นงานประจำ (สร้างหลายวันพร้อมกัน)
+    </label>
+    <div class="repeat-box" id="repeatBox">
+      <div class="grid2">
+        <div><label>ความถี่</label><select id="f_repeat_freq">
+          <option value="daily">ทุกวัน</option>
+          <option value="weekly">ทุกสัปดาห์</option>
+          <option value="monthly">ทุกเดือน</option>
+        </select></div>
+        <div><label>ทำซ้ำจนถึงวันที่</label><input type="date" id="f_repeat_until"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="history" id="historyBox">
+    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">ประวัติการแก้ไข</div>
+    <div id="historyList"></div>
+  </div>
+
   <div class="bar" style="margin-top:16px;justify-content:flex-end">
+    <button class="ghost" id="btnHist" onclick="loadHistory()" style="display:none">🕘 ประวัติ</button>
     <button class="danger" id="btnDel" onclick="del()" style="display:none">ลบ</button>
     <button class="ghost" onclick="closeForm()">ยกเลิก</button>
     <button class="primary" onclick="save()">บันทึก</button>
@@ -205,6 +241,49 @@ function pull(silent) {
     .then(function () { busy = false; });
 }
 
+/* ============ คิวออฟไลน์: ถ้าบันทึก/ลบตอนเน็ตหลุด เก็บไว้ในเครื่องแล้วซิงก์อัตโนมัติทีหลัง ============ */
+var QUEUE_KEY = 'pendingQueue';
+
+function getQueue() {
+  try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+function setQueue(q) {
+  localStorage.setItem(QUEUE_KEY, JSON.stringify(q));
+  renderQueueBadge();
+}
+function queueAction(body) {
+  var q = getQueue();
+  q.push(body);
+  setQueue(q);
+}
+function renderQueueBadge() {
+  var el = document.getElementById('queueBadge');
+  if (!el) return;
+  var n = getQueue().length;
+  if (n > 0) { el.style.display = 'inline-block'; el.textContent = '📥 ค้างซิงก์ ' + n + ' รายการ'; }
+  else el.style.display = 'none';
+}
+function isNetworkError(e) {
+  return e && e.name === 'TypeError'; // fetch reject ด้วย TypeError เมื่อออฟไลน์/เน็ตหลุด ต่างจาก error จาก server ที่ throw new Error(...)
+}
+
+/* ปรับข้อมูลในเครื่อง (data) ทันทีแบบ optimistic เพื่อให้ผู้ใช้เห็นผลทันทีแม้ยังไม่ได้ซิงก์ขึ้นส่วนกลาง */
+function applyOptimistic(body) {
+  if (body.action === 'delete') {
+    data = data.filter(function (d) { return d.id !== String(body.id); });
+  } else if (body.action === 'saveMany') {
+    (body.rows || []).forEach(function (row) { upsertLocal(row); });
+  } else {
+    upsertLocal(body.row || body);
+  }
+}
+function upsertLocal(row) {
+  var idx = -1;
+  for (var i = 0; i < data.length; i++) if (data[i].id === String(row.id)) idx = i;
+  if (idx === -1) data.push(row); else data[idx] = row;
+}
+
 function push(action, payload) {
   msg('💾 กำลังบันทึกลงส่วนกลาง...', true);
   busy = true;
@@ -223,10 +302,48 @@ function push(action, payload) {
       draw();
     })
     .catch(function (e) {
-      msg('⚠️ บันทึกไม่สำเร็จ: ' + e.message, true);
-      alert('บันทึกไม่สำเร็จ: ' + e.message);
+      if (isNetworkError(e)) {
+        queueAction(body);
+        applyOptimistic(body);
+        msg('📴 ออฟไลน์ — บันทึกไว้ในเครื่องแล้ว จะซิงก์ให้อัตโนมัติเมื่อเน็ตกลับมา', true);
+        draw();
+      } else {
+        msg('⚠️ บันทึกไม่สำเร็จ: ' + e.message, true);
+        alert('บันทึกไม่สำเร็จ: ' + e.message);
+      }
     })
     .then(function () { busy = false; });
+}
+
+/* พยายามส่งรายการที่ค้างอยู่ในคิวออฟไลน์ทีละรายการ เรียกซ้ำเองจนกว่าจะหมดคิวหรือเน็ตหลุดอีกครั้ง */
+function trySyncQueue() {
+  var q = getQueue();
+  if (!q.length || busy) return;
+  busy = true;
+  msg('🔄 กำลังซิงก์รายการที่ค้างไว้ (' + q.length + ' รายการ)...', true);
+
+  fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(q[0])
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j.ok) throw new Error(j.error);
+      data = j.data;
+      setQueue(getQueue().slice(1));
+      busy = false;
+      if (getQueue().length) { trySyncQueue(); } else { msg('', false); draw(); }
+    })
+    .catch(function (e) {
+      busy = false;
+      if (!isNetworkError(e)) {
+        /* server ปฏิเสธทั้งที่ต่อเน็ตได้ (เช่น id ผิด/สิทธิ์ไม่ผ่าน) -> ตัดออกจากคิวกันค้างวนซ้ำตลอดไป */
+        setQueue(getQueue().slice(1));
+        msg('⚠️ ซิงก์รายการหนึ่งไม่สำเร็จ (' + e.message + ') ข้ามไปก่อน', true);
+      }
+      /* ถ้ายังออฟไลน์อยู่ ปล่อยคิวไว้เหมือนเดิม รอบถัดไปจะลองใหม่เอง */
+    });
 }
 
 function uid() { return Date.now() + '' + Math.floor(Math.random() * 999); }
@@ -267,8 +384,10 @@ document.addEventListener('click', function (ev) {
 /* ============ ฟิลเตอร์ ============ */
 function filtered() {
   var p = fP.value, s = fS.value, l = fL.value;
+  var q = (fQ.value || '').trim().toLowerCase();
   return data.filter(function (e) {
-    return (!p || e.proj === p) && (!s || e.site === s) && (!l || e.lead === l);
+    var matchQ = !q || (e.site + ' ' + e.proj + ' ' + e.lead + ' ' + e.note).toLowerCase().indexOf(q) !== -1;
+    return (!p || e.proj === p) && (!s || e.site === s) && (!l || e.lead === l) && matchQ;
   });
 }
 function fillFilters() {
@@ -352,6 +471,7 @@ function draw() {
 function openForm(date, id) {
   editId = id || null;
   btnDel.style.display = id ? 'inline-block' : 'none';
+  btnHist.style.display = id ? 'inline-block' : 'none';
   mTitle.textContent = id ? 'แก้ไขรายการ' : 'เพิ่มรายการเข้า Site';
   var e = null;
   if (id) { for (var i = 0; i < data.length; i++) if (data[i].id === id) e = data[i]; }
@@ -366,9 +486,60 @@ function openForm(date, id) {
   f_type.value = e ? e.type : 'ติดตั้ง';
   f_status.value = e ? e.status : 'วางแผน';
   f_note.value = e ? e.note : '';
+
+  /* งานประจำ (สร้างหลายวัน) ใช้ได้แค่ตอนเพิ่มรายการใหม่ ไม่ใช่ตอนแก้ไขรายการเดิม */
+  repeatWrap.style.display = id ? 'none' : 'block';
+  f_repeat.checked = false;
+  repeatBox.style.display = 'none';
+  f_repeat_until.value = '';
+
+  historyBox.style.display = 'none';
+  historyList.innerHTML = '';
+
   modal.classList.add('on');
 }
 function closeForm() { modal.classList.remove('on'); }
+
+/* ============ ประวัติการแก้ไข: ดึง audit log ของรายการนี้จาก backend มาแสดง ============ */
+function loadHistory() {
+  if (!editId) return;
+  var box = document.getElementById('historyBox');
+  var list = document.getElementById('historyList');
+  var show = box.style.display === 'none';
+  box.style.display = show ? 'block' : 'none';
+  if (!show) return;
+
+  list.innerHTML = '<div style="font-size:12px;opacity:.6">กำลังโหลด...</div>';
+  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&action=audit&id=' + encodeURIComponent(editId) + '&t=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j.ok) throw new Error(j.error);
+      var LBL = { save: 'บันทึก/แก้ไข', delete: 'ลบ' };
+      list.innerHTML = j.data.length
+        ? j.data.map(function (h) {
+            return '<div class="h-row"><b>' + esc(LBL[h.action] || h.action) + '</b> — ' + esc(h.time) + ' — โดย ' + esc(h.by || 'ไม่ระบุ') + '</div>';
+          }).join('')
+        : '<div style="font-size:12px;opacity:.6">ยังไม่มีประวัติ</div>';
+    })
+    .catch(function (e) {
+      list.innerHTML = '<div style="font-size:12px;color:#b91c1c">โหลดประวัติไม่สำเร็จ: ' + esc(e.message) + '</div>';
+    });
+}
+
+/* ============ งานประจำ: คำนวณรายการวันที่ตามความถี่ ============ */
+function addPeriod(dateStr, freq) {
+  var p = dateStr.split('-').map(Number);
+  var d = new Date(p[0], p[1] - 1, p[2]);
+  if (freq === 'daily') d.setDate(d.getDate() + 1);
+  else if (freq === 'weekly') d.setDate(d.getDate() + 7);
+  else d.setMonth(d.getMonth() + 1); // monthly
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function buildRecurrence(startDate, until, freq) {
+  var out = [], cur = startDate, guard = 0;
+  while (cur <= until && guard < 366) { out.push(cur); cur = addPeriod(cur, freq); guard++; }
+  return out;
+}
 
 function save() {
   if (busy) return;
@@ -383,6 +554,22 @@ function save() {
     num: f_num.value, type: f_type.value, status: f_status.value, note: f_note.value.trim(),
     updatedBy: ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
   };
+
+  /* งานประจำ: สร้างหลายแถวพร้อมกัน ใช้ได้เฉพาะตอนเพิ่มรายการใหม่เท่านั้น */
+  if (!editId && f_repeat.checked && f_repeat_until.value) {
+    var dates = buildRecurrence(f_date.value, f_repeat_until.value, f_repeat_freq.value);
+    if (!dates.length) { alert('ช่วงวันที่ทำซ้ำไม่ถูกต้อง (วันสิ้นสุดต้องไม่ก่อนวันเริ่ม)'); return; }
+    var rows = dates.map(function (d, i) {
+      var rr = {};
+      for (var k in row) rr[k] = row[k];
+      rr.id = uid() + i; // กันชนกันเวลาสร้างหลายแถวในมิลลิวินาทีเดียว
+      rr.date = d;
+      return rr;
+    });
+    closeForm();
+    push('saveMany', { rows: rows });
+    return;
+  }
 
   /* รายการใหม่ ไม่มีอะไรให้ชนกัน บันทึกได้เลย */
   if (!editId) { closeForm(); push('save', { row: row }); return; }
@@ -427,7 +614,7 @@ function del() {
   if (!confirm('ลบรายการนี้? (ทุกคนในทีมจะเห็นผล)')) return;
   var id = editId;
   closeForm();
-  push('delete', { id: id });
+  push('delete', { id: id, by: ME });
 }
 
 /* ============ ส่งออก / แชร์ ============ */
@@ -458,13 +645,18 @@ function expCSV() {
 draw();
 pull();
 pingPresence();
+renderQueueBadge();
+trySyncQueue(); // เผื่อมีรายการค้างจากตอนปิดแท็บครั้งก่อนตอนออฟไลน์
 setInterval(function () {
   if (!busy && !modal.classList.contains('on')) pull(true);
+  trySyncQueue();
 }, 20000);
 setInterval(pingPresence, 15000);
+window.addEventListener('online', trySyncQueue);
 document.addEventListener('visibilitychange', function () {
   if (!document.hidden) {
     pingPresence();
+    trySyncQueue();
     if (!busy) pull(true);
   }
 });
