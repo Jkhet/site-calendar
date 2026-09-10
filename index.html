@@ -36,12 +36,13 @@ select,input,textarea{padding:8px 10px;border:1px solid #cbd5e1;border-radius:8p
 .nav h2{font-size:16px;font-weight:600;letter-spacing:.2px}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .dow{text-align:center;font-size:11.5px;font-weight:600;letter-spacing:.3px;color:var(--muted);padding:5px 0}
-.day{min-height:80px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:5px;cursor:pointer;transition:.15s}
+.day{min-height:90px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:5px;cursor:pointer;transition:.15s}
 .day:hover{border-color:var(--navy);background:#eafaf3}
 .day.off{opacity:.4}.day.today{border:2px solid var(--teal);background:#eafaf3}
 .dnum{font-size:11.5px;font-weight:600;color:#475569;margin-bottom:3px}
-.ev{font-size:10.5px;padding:2px 5px;border-radius:5px;margin-bottom:3px;color:#fff;line-height:1.3;overflow:hidden}
-.s1{background:#64748b}.s2{background:#f59e0b}.s3{background:#16a34a}.s4{background:#dc2626}
+.ev{font-size:11.5px;font-weight:500;padding:3px 6px;border-radius:6px;margin-bottom:4px;color:#fff;line-height:1.55;overflow:hidden;text-shadow:0 1px 1px rgba(0,0,0,.3)}
+.ev b{font-weight:700}
+.s1{background:#475569}.s2{background:#b45309}.s3{background:#15803d}.s4{background:#b91c1c}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th{background:#f8fafc;padding:8px 9px;text-align:left;font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);white-space:nowrap;border-bottom:1px solid var(--line)}
 td{padding:8px 9px;border-top:1px solid var(--line);vertical-align:top}
@@ -61,7 +62,7 @@ tr:hover td{background:#f8fafc}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);display:block;margin:10px 0 4px}
 #ro{background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:9px;font-size:13px;margin-bottom:12px;display:none}
-@media(max-width:640px){.day{min-height:56px}.ev{font-size:9px}.grid2{grid-template-columns:1fr}body{padding:10px}}
+@media(max-width:640px){.day{min-height:66px}.ev{font-size:10px}.grid2{grid-template-columns:1fr}body{padding:10px}}
 @media print{.bar,.nav button,header{display:none}#tableCard{display:block !important}}
 </style>
 </head>
