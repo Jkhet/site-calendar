@@ -429,7 +429,7 @@ function draw() {
   for (var i = start - 1; i >= 0; i--) h += '<div class="day off"><div class="dnum">' + (prev - i) + '</div></div>';
   for (var d = 1; d <= days; d++) {
     var ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-    var list = ev.filter(function (e) { return e.date === ds; });
+    var list = ev.filter(function (e) { return e.date === ds; }).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
     var t = new Date(y, m, d).toDateString() === today ? ' today' : '';
     h += '<div class="day' + t + '" onclick="openForm(\'' + ds + '\')"><div class="dnum">' + d + '</div>' +
       list.map(function (e) {
@@ -552,7 +552,8 @@ function save() {
     date: f_date.value, tin: f_in.value, tout: f_out.value,
     proj: f_proj.value.trim(), site: f_site.value.trim(), lead: f_lead.value.trim(),
     num: f_num.value, type: f_type.value, status: f_status.value, note: f_note.value.trim(),
-    updatedBy: ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
+    updatedBy: ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }),
+    ts: Date.now()   // ใช้เรียง "เพิ่ง/แก้ล่าสุดอยู่บนสุด" ในปฏิทิน
   };
 
   /* งานประจำ: สร้างหลายแถวพร้อมกัน ใช้ได้เฉพาะตอนเพิ่มรายการใหม่เท่านั้น */
@@ -564,6 +565,7 @@ function save() {
       for (var k in row) rr[k] = row[k];
       rr.id = uid() + i; // กันชนกันเวลาสร้างหลายแถวในมิลลิวินาทีเดียว
       rr.date = d;
+      rr.ts = row.ts + i; // กันเสมอกันเป๊ะๆ ทุกแถว ให้เรียงลำดับคงที่ภายในชุดเดียวกัน
       return rr;
     });
     closeForm();
