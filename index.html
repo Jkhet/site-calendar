@@ -176,6 +176,19 @@ label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);di
  </div>
 </div>
 
+<div class="modal" id="loginModal">
+ <div class="box" style="max-width:360px">
+  <h2 style="font-size:18px;margin-bottom:4px">🔐 เข้าสู่ระบบ</h2>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:12px">ใช้ชื่อ+รหัสผ่านเดิมได้จากทุกเครื่อง/เบราว์เซอร์ — ถ้าเป็นชื่อใหม่ ระบบจะสร้างบัญชีให้อัตโนมัติด้วยรหัสผ่านที่ตั้งตอนนี้</p>
+  <label>ชื่อของคุณ</label><input id="lg_name" placeholder="เช่น เขตต์" onkeydown="if(event.key==='Enter')doLogin()">
+  <label>รหัสผ่าน</label><input id="lg_pass" type="password" placeholder="รหัสผ่านส่วนตัว" onkeydown="if(event.key==='Enter')doLogin()">
+  <div id="lgMsg" style="font-size:12px;color:#b91c1c;margin-top:8px;display:none"></div>
+  <div class="bar" style="margin-top:14px;justify-content:flex-end">
+    <button class="primary" id="lgBtn" onclick="doLogin()">เข้าสู่ระบบ</button>
+  </div>
+ </div>
+</div>
+
 <script>
 /* ============ ตั้งค่า ============ */
 var API = 'https://script.google.com/macros/s/AKfycbyqGs1aJdwZN21m357fzmCrR4Ei3lNf8EfB1dy5zxxr2ESoqkdzaX7bevqs9oJjCCQRVg/exec';
@@ -194,7 +207,44 @@ var cur = new Date();
 cur.setDate(1);
 
 var ME = localStorage.getItem('myName');
-if (!ME) { ME = prompt('ใส่ชื่อคุณ (แสดงว่าใครแก้ไขล่าสุด):') || 'ไม่ระบุ'; localStorage.setItem('myName', ME); }
+
+/* ============ เข้าสู่ระบบ: ชื่อ+รหัสผ่าน เช็คกับ backend (ใช้ได้ทุกเครื่อง/เบราว์เซอร์ ไม่ใช่แค่เครื่องเดิม) ============ */
+function doLogin() {
+  var name = document.getElementById('lg_name').value.trim();
+  var pass = document.getElementById('lg_pass').value;
+  var msgEl = document.getElementById('lgMsg');
+  var btn = document.getElementById('lgBtn');
+  if (!name || !pass) {
+    msgEl.textContent = 'กรุณากรอกชื่อและรหัสผ่าน';
+    msgEl.style.display = 'block';
+    return;
+  }
+  msgEl.style.display = 'none';
+  btn.textContent = 'กำลังตรวจสอบ...';
+  fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ token: TOKEN, action: 'login', name: name, password: pass })
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      btn.textContent = 'เข้าสู่ระบบ';
+      if (!j.ok) {
+        msgEl.textContent = j.error || 'เข้าสู่ระบบไม่สำเร็จ';
+        msgEl.style.display = 'block';
+        return;
+      }
+      ME = j.name;
+      localStorage.setItem('myName', ME);
+      document.getElementById('loginModal').classList.remove('on');
+      initApp();
+    })
+    .catch(function (e) {
+      btn.textContent = 'เข้าสู่ระบบ';
+      msgEl.textContent = 'เชื่อมต่อไม่สำเร็จ (ต้องมีอินเทอร์เน็ตตอนเข้าสู่ระบบครั้งแรกบนเครื่อง/เบราว์เซอร์นี้): ' + e.message;
+      msgEl.style.display = 'block';
+    });
+}
 
 /* ============ ความปลอดภัย: escape ข้อความก่อนแทรกลง HTML ============ */
 function esc(s) {
@@ -643,25 +693,33 @@ function expCSV() {
   a.click();
 }
 
-/* ============ เริ่มทำงาน + ซิงก์อัตโนมัติ ============ */
-draw();
-pull();
-pingPresence();
-renderQueueBadge();
-trySyncQueue(); // เผื่อมีรายการค้างจากตอนปิดแท็บครั้งก่อนตอนออฟไลน์
-setInterval(function () {
-  if (!busy && !modal.classList.contains('on')) pull(true);
-  trySyncQueue();
-}, 20000);
-setInterval(pingPresence, 15000);
-window.addEventListener('online', trySyncQueue);
-document.addEventListener('visibilitychange', function () {
-  if (!document.hidden) {
-    pingPresence();
+/* ============ เริ่มทำงาน + ซิงก์อัตโนมัติ (เรียกหลังล็อกอินสำเร็จเท่านั้น) ============ */
+function initApp() {
+  draw();
+  pull();
+  pingPresence();
+  renderQueueBadge();
+  trySyncQueue(); // เผื่อมีรายการค้างจากตอนปิดแท็บครั้งก่อนตอนออฟไลน์
+  setInterval(function () {
+    if (!busy && !modal.classList.contains('on')) pull(true);
     trySyncQueue();
-    if (!busy) pull(true);
-  }
-});
+  }, 20000);
+  setInterval(pingPresence, 15000);
+  window.addEventListener('online', trySyncQueue);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) {
+      pingPresence();
+      trySyncQueue();
+      if (!busy) pull(true);
+    }
+  });
+}
+
+if (ME) {
+  initApp(); // เคยล็อกอินบนเครื่อง/เบราว์เซอร์นี้มาก่อนแล้ว (มีชื่อค้างใน localStorage) เข้าใช้งานได้เลย
+} else {
+  document.getElementById('loginModal').classList.add('on'); // เครื่อง/เบราว์เซอร์ใหม่ -> ต้องล็อกอินก่อน
+}
 </script>
 </body>
 </html>
