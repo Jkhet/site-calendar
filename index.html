@@ -91,12 +91,13 @@ label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);di
 
 <div class="bar">
   <button class="primary" onclick="openForm()">+ เพิ่มรายการ</button>
-  <button class="ghost" onclick="pull()">🔄 รีเฟรช</button>
+  <button class="ghost" onclick="trySyncQueue();pull()">🔄 รีเฟรช</button>
   <button class="ghost" onclick="share()">🔗 คัดลอกลิงก์</button>
   <button class="ghost" onclick="expCSV()">⬇️ CSV</button>
   <button class="ghost" onclick="window.print()">🖨️ พิมพ์</button>
   <button class="ghost" id="btnTable" onclick="toggleTable()">📋 สรุปรายการ</button>
   <span class="queue-badge" id="queueBadge"></span>
+  <button class="ghost" onclick="doLogout()" id="btnLogout" style="margin-left:auto">🚪 <span id="meLabel"></span></button>
 </div>
 
 <div class="bar">
@@ -207,6 +208,17 @@ var cur = new Date();
 cur.setDate(1);
 
 var ME = localStorage.getItem('myName');
+var SESSION = localStorage.getItem('sessionToken');
+
+/* ============ ช่วยตรวจ session หมดอายุ/ไม่ถูกต้อง -> บังคับกลับไปหน้าล็อกอิน ============ */
+function isAuthError(j) {
+  return j && j.ok === false && (j.error === 'session_expired' || j.error === 'unauthorized');
+}
+function forceRelogin() {
+  localStorage.removeItem('myName');
+  localStorage.removeItem('sessionToken');
+  location.reload();
+}
 
 /* ============ เข้าสู่ระบบ: ชื่อ+รหัสผ่าน เช็คกับ backend (ใช้ได้ทุกเครื่อง/เบราว์เซอร์ ไม่ใช่แค่เครื่องเดิม) ============ */
 function doLogin() {
@@ -235,7 +247,9 @@ function doLogin() {
         return;
       }
       ME = j.name;
+      SESSION = j.session;
       localStorage.setItem('myName', ME);
+      localStorage.setItem('sessionToken', SESSION);
       document.getElementById('loginModal').classList.remove('on');
       initApp();
     })
@@ -244,6 +258,15 @@ function doLogin() {
       msgEl.textContent = 'เชื่อมต่อไม่สำเร็จ (ต้องมีอินเทอร์เน็ตตอนเข้าสู่ระบบครั้งแรกบนเครื่อง/เบราว์เซอร์นี้): ' + e.message;
       msgEl.style.display = 'block';
     });
+}
+
+function doLogout() {
+  if (!confirm('ออกจากระบบ? ครั้งหน้าต้องล็อกอินใหม่')) return;
+  fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ token: TOKEN, session: SESSION, action: 'logout' })
+  }).catch(function () {}).then(function () { forceRelogin(); });
 }
 
 /* ============ ความปลอดภัย: escape ข้อความก่อนแทรกลง HTML ============ */
@@ -277,11 +300,13 @@ function msg(text, show) {
 function pull(silent) {
   if (!silent) msg('⏳ กำลังโหลดข้อมูล', true);
   busy = true;
-  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&t=' + Date.now())
+  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&session=' + encodeURIComponent(SESSION) + '&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (j) {
+      if (isAuthError(j)) { forceRelogin(); return; }
       if (!j.ok) throw new Error(j.error);
       data = j.data;
+      reapplyQueue(); // มีรายการค้างซิงก์อยู่ในคิว -> ทับข้อมูลสดจาก server ด้วยของที่ยังไม่ได้ซิงก์ กันไม่ให้หายไปจากจอชั่วคราว
       msg('', false);
       draw();
     })
@@ -333,11 +358,14 @@ function upsertLocal(row) {
   for (var i = 0; i < data.length; i++) if (data[i].id === String(row.id)) idx = i;
   if (idx === -1) data.push(row); else data[idx] = row;
 }
+function reapplyQueue() {
+  getQueue().forEach(function (body) { applyOptimistic(body); });
+}
 
 function push(action, payload) {
   msg('💾 กำลังบันทึกลงส่วนกลาง...', true);
   busy = true;
-  var body = { token: TOKEN, action: action };
+  var body = { token: TOKEN, session: SESSION, action: action };
   for (var k in payload) body[k] = payload[k];
   fetch(API, {
     method: 'POST',
@@ -346,6 +374,7 @@ function push(action, payload) {
   })
     .then(function (r) { return r.json(); })
     .then(function (j) {
+      if (isAuthError(j)) { forceRelogin(); return; }
       if (!j.ok) throw new Error(j.error);
       data = j.data;
       msg('', false);
@@ -372,13 +401,19 @@ function trySyncQueue() {
   busy = true;
   msg('🔄 กำลังซิงก์รายการที่ค้างไว้ (' + q.length + ' รายการ)...', true);
 
+  var next = {};
+  for (var k in q[0]) next[k] = q[0][k];
+  next.token = TOKEN;
+  next.session = SESSION; // ใช้ token/session ปัจจุบันเสมอ เผื่อมีการล็อกอินใหม่ระหว่างที่ค้างอยู่ในคิว
+
   fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(q[0])
+    body: JSON.stringify(next)
   })
     .then(function (r) { return r.json(); })
     .then(function (j) {
+      if (isAuthError(j)) { forceRelogin(); return; }
       if (!j.ok) throw new Error(j.error);
       data = j.data;
       setQueue(getQueue().slice(1));
@@ -403,10 +438,10 @@ function pingPresence() {
   fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ token: TOKEN, action: 'ping', name: ME })
+    body: JSON.stringify({ token: TOKEN, session: SESSION, action: 'ping' })
   })
     .then(function (r) { return r.json(); })
-    .then(function (j) { if (j.ok) renderPresence(j.online || []); })
+    .then(function (j) { if (j.ok) renderPresence(j.online || []); else if (isAuthError(j)) forceRelogin(); })
     .catch(function () { /* เงียบไว้ ไม่รบกวนการทำงานหลัก */ });
 }
 
@@ -479,7 +514,7 @@ function draw() {
   for (var i = start - 1; i >= 0; i--) h += '<div class="day off"><div class="dnum">' + (prev - i) + '</div></div>';
   for (var d = 1; d <= days; d++) {
     var ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-    var list = ev.filter(function (e) { return e.date === ds; }).sort(function (a, b) { return a.site.localeCompare(b.site, 'th'); });
+    var list = ev.filter(function (e) { return e.date === ds; }).sort(function (a, b) { return a.site.localeCompare(b.site, 'th', { numeric: true }); });
     var t = new Date(y, m, d).toDateString() === today ? ' today' : '';
     h += '<div class="day' + t + '" onclick="openForm(\'' + ds + '\')"><div class="dnum">' + d + '</div>' +
       list.map(function (e) {
@@ -560,9 +595,10 @@ function loadHistory() {
   if (!show) return;
 
   list.innerHTML = '<div style="font-size:12px;opacity:.6">กำลังโหลด...</div>';
-  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&action=audit&id=' + encodeURIComponent(editId) + '&t=' + Date.now())
+  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&session=' + encodeURIComponent(SESSION) + '&action=audit&id=' + encodeURIComponent(editId) + '&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (j) {
+      if (isAuthError(j)) { forceRelogin(); return; }
       if (!j.ok) throw new Error(j.error);
       var LBL = { save: 'บันทึก/แก้ไข', delete: 'ลบ' };
       list.innerHTML = j.data.length
@@ -629,11 +665,13 @@ function save() {
   /* แก้ไขรายการเดิม -> เช็คก่อนว่าระหว่างที่เปิดฟอร์มอยู่ มีคนอื่นแก้ไป/ลบไปหรือยัง */
   busy = true;
   msg('🔎 กำลังตรวจสอบข้อมูลล่าสุดก่อนบันทึก...', true);
-  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&t=' + Date.now())
+  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&session=' + encodeURIComponent(SESSION) + '&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (j) {
+      if (isAuthError(j)) { forceRelogin(); return; }
       if (!j.ok) throw new Error(j.error);
       data = j.data;
+      reapplyQueue();
       var latest = null;
       for (var i = 0; i < data.length; i++) if (data[i].id === editId) latest = data[i];
       busy = false;
@@ -695,14 +733,15 @@ function expCSV() {
 
 /* ============ เริ่มทำงาน + ซิงก์อัตโนมัติ (เรียกหลังล็อกอินสำเร็จเท่านั้น) ============ */
 function initApp() {
+  document.getElementById('meLabel').textContent = ME;
   draw();
+  renderQueueBadge();
+  trySyncQueue(); // เผื่อมีรายการค้างจากตอนปิดแท็บครั้งก่อนตอนออฟไลน์ (ต้องมาก่อน pull())
   pull();
   pingPresence();
-  renderQueueBadge();
-  trySyncQueue(); // เผื่อมีรายการค้างจากตอนปิดแท็บครั้งก่อนตอนออฟไลน์
   setInterval(function () {
+    trySyncQueue(); // ต้องมาก่อน pull() เสมอ ไม่งั้น pull() จะตั้ง busy=true ก่อน ทำให้ trySyncQueue ถูกข้ามทุกรอบ
     if (!busy && !modal.classList.contains('on')) pull(true);
-    trySyncQueue();
   }, 20000);
   setInterval(pingPresence, 15000);
   window.addEventListener('online', trySyncQueue);
@@ -715,10 +754,10 @@ function initApp() {
   });
 }
 
-if (ME) {
-  initApp(); // เคยล็อกอินบนเครื่อง/เบราว์เซอร์นี้มาก่อนแล้ว (มีชื่อค้างใน localStorage) เข้าใช้งานได้เลย
+if (ME && SESSION) {
+  initApp(); // เคยล็อกอินบนเครื่อง/เบราว์เซอร์นี้มาก่อนแล้ว (มี session ค้างใน localStorage) เข้าใช้งานได้เลย
 } else {
-  document.getElementById('loginModal').classList.add('on'); // เครื่อง/เบราว์เซอร์ใหม่ -> ต้องล็อกอินก่อน
+  document.getElementById('loginModal').classList.add('on'); // เครื่อง/เบราว์เซอร์ใหม่ หรือไม่มี session ที่ถูกต้อง -> ต้องล็อกอินก่อน
 }
 </script>
 </body>
