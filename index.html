@@ -50,6 +50,8 @@ select,input,textarea{padding:8px 10px;border:1px solid #cbd5e1;border-radius:8p
 .dnum{font-size:11.5px;font-weight:600;color:#475569;margin-bottom:3px}
 .ev{font-size:11.5px;font-weight:500;padding:3px 6px;border-radius:6px;margin-bottom:4px;color:#fff;line-height:1.55;overflow:hidden;text-shadow:0 1px 1px rgba(0,0,0,.3)}
 .ev b{font-weight:700}
+.ev-more{font-size:11px;font-weight:600;color:var(--navy);text-align:center;padding:3px 4px;border-radius:6px;background:#f1f5f9;cursor:pointer}
+.ev-more:hover{background:#e2e8f0}
 .s1{background:#475569}.s2{background:#b45309}.s3{background:#15803d}.s4{background:#b91c1c}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th{background:#f8fafc;padding:8px 9px;text-align:left;font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);white-space:nowrap;border-bottom:1px solid var(--line)}
@@ -173,6 +175,16 @@ label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);di
     <button class="danger" id="btnDel" onclick="del()" style="display:none">ลบ</button>
     <button class="ghost" onclick="closeForm()">ยกเลิก</button>
     <button class="primary" onclick="save()">บันทึก</button>
+  </div>
+ </div>
+</div>
+
+<div class="modal" id="dayModal">
+ <div class="box">
+  <h2 id="dayModalTitle" style="font-size:16px;margin-bottom:10px"></h2>
+  <div id="dayModalList" style="display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto"></div>
+  <div class="bar" style="margin-top:14px;justify-content:flex-end">
+    <button class="ghost" onclick="closeDayModal()">ปิด</button>
   </div>
  </div>
 </div>
@@ -491,6 +503,20 @@ function fillFilters() {
 }
 function mv(n) { cur.setMonth(cur.getMonth() + n); draw(); }
 
+/* ============ ดูรายการทั้งหมดของวันที่มีงานเยอะ (เกินจำนวนที่โชว์ในช่องปฏิทิน) ============ */
+function openDayDetail(ds) {
+  var p = ds.split('-').map(Number);
+  var d = new Date(p[0], p[1] - 1, p[2]);
+  var list = filtered().filter(function (e) { return e.date === ds; }).sort(function (a, b) { return a.site.localeCompare(b.site, 'th', { numeric: true }); });
+
+  document.getElementById('dayModalTitle').textContent = d.getDate() + ' ' + MON[d.getMonth()] + ' ' + (d.getFullYear() + 543) + ' (' + list.length + ' รายการ)';
+  document.getElementById('dayModalList').innerHTML = list.map(function (e) {
+    return '<div class="ev ' + (SC[e.status] || 's1') + '" style="margin-bottom:0;cursor:pointer" onclick="closeDayModal();openForm(null,\'' + esc(e.id) + '\')"><b>' + esc(e.site) + '</b><br>' + esc(e.lead) + '</div>';
+  }).join('');
+  document.getElementById('dayModal').classList.add('on');
+}
+function closeDayModal() { document.getElementById('dayModal').classList.remove('on'); }
+
 /* ============ ย่อ/ขยาย การ์ดรายการทั้งหมดในเดือนนี้ (ซ่อนไว้เป็นค่าเริ่มต้น กันหน้าจอรก) ============ */
 function toggleTable() {
   var card = document.getElementById('tableCard');
@@ -510,16 +536,21 @@ function draw() {
   var prev = new Date(y, m, 0).getDate();
   var ev = filtered(), today = new Date().toDateString();
 
+  var DAY_PILL_LIMIT = 3;
   var h = DOW.map(function (d) { return '<div class="dow">' + d + '</div>'; }).join('');
   for (var i = start - 1; i >= 0; i--) h += '<div class="day off"><div class="dnum">' + (prev - i) + '</div></div>';
   for (var d = 1; d <= days; d++) {
     var ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
     var list = ev.filter(function (e) { return e.date === ds; }).sort(function (a, b) { return a.site.localeCompare(b.site, 'th', { numeric: true }); });
+    var shown = list.slice(0, DAY_PILL_LIMIT);
+    var more = list.length - shown.length;
     var t = new Date(y, m, d).toDateString() === today ? ' today' : '';
     h += '<div class="day' + t + '" onclick="openForm(\'' + ds + '\')"><div class="dnum">' + d + '</div>' +
-      list.map(function (e) {
+      shown.map(function (e) {
         return '<div class="ev ' + (SC[e.status] || 's1') + '" onclick="event.stopPropagation();openForm(null,\'' + esc(e.id) + '\')"><b>' + esc(e.site) + '</b><br>' + esc(e.lead) + '</div>';
-      }).join('') + '</div>';
+      }).join('') +
+      (more > 0 ? '<div class="ev-more" onclick="event.stopPropagation();openDayDetail(\'' + ds + '\')">+' + more + ' เพิ่มเติม</div>' : '') +
+      '</div>';
   }
   var tail = (7 - ((start + days) % 7)) % 7;
   for (var j = 1; j <= tail; j++) h += '<div class="day off"><div class="dnum">' + j + '</div></div>';
