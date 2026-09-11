@@ -479,7 +479,7 @@ function draw() {
   for (var i = start - 1; i >= 0; i--) h += '<div class="day off"><div class="dnum">' + (prev - i) + '</div></div>';
   for (var d = 1; d <= days; d++) {
     var ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-    var list = ev.filter(function (e) { return e.date === ds; }).sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+    var list = ev.filter(function (e) { return e.date === ds; }).sort(function (a, b) { return a.site.localeCompare(b.site, 'th'); });
     var t = new Date(y, m, d).toDateString() === today ? ' today' : '';
     h += '<div class="day' + t + '" onclick="openForm(\'' + ds + '\')"><div class="dnum">' + d + '</div>' +
       list.map(function (e) {
