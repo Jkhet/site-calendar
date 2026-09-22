@@ -267,7 +267,7 @@ function doLogin() {
     })
     .catch(function (e) {
       btn.textContent = 'เข้าสู่ระบบ';
-      msgEl.textContent = 'เชื่อมต่อไม่สำเร็จ (ต้องมีอินเทอร์เน็ตตอนเข้าสู่ระบบครั้งแรกบนเครื่อง/เบราว์เซอร์นี้): ' + e.message;
+      msgEl.textContent = 'เชื่อมต่อไม่สำเร็จ: ' + friendlyFetchError(e);
       msgEl.style.display = 'block';
     });
 }
@@ -323,7 +323,7 @@ function pull(silent) {
       draw();
     })
     .catch(function (e) {
-      msg('⚠️ เชื่อมต่อไม่สำเร็จ: ' + e.message + ' — กด 🔄 รีเฟรชเพื่อลองใหม่', true);
+      msg('⚠️ เชื่อมต่อไม่สำเร็จ: ' + friendlyFetchError(e) + ' — กด 🔄 รีเฟรชเพื่อลองใหม่', true);
     })
     .then(function () { busy = false; });
 }
@@ -353,6 +353,11 @@ function renderQueueBadge() {
 }
 function isNetworkError(e) {
   return e && e.name === 'TypeError'; // fetch reject ด้วย TypeError เมื่อออฟไลน์/เน็ตหลุด ต่างจาก error จาก server ที่ throw new Error(...)
+}
+function friendlyFetchError(e) {
+  if (isNetworkError(e)) return 'ไม่มีการเชื่อมต่ออินเทอร์เน็ต หรือเข้าถึงเซิร์ฟเวอร์ไม่ได้';
+  if (e instanceof SyntaxError) return 'เซิร์ฟเวอร์ตอบกลับมาไม่ใช่ข้อมูลที่ถูกต้อง — มักเกิดจาก Apps Script ยังไม่ได้ deploy เวอร์ชันล่าสุด หรือตั้งค่าสิทธิ์การเข้าถึงไม่ถูกต้อง ลองเปิด URL ของ Apps Script ตรงๆ ในเบราว์เซอร์เพื่อตรวจสอบ';
+  return e.message;
 }
 
 /* ปรับข้อมูลในเครื่อง (data) ทันทีแบบ optimistic เพื่อให้ผู้ใช้เห็นผลทันทีแม้ยังไม่ได้ซิงก์ขึ้นส่วนกลาง */
@@ -399,8 +404,8 @@ function push(action, payload) {
         msg('📴 ออฟไลน์ — บันทึกไว้ในเครื่องแล้ว จะซิงก์ให้อัตโนมัติเมื่อเน็ตกลับมา', true);
         draw();
       } else {
-        msg('⚠️ บันทึกไม่สำเร็จ: ' + e.message, true);
-        alert('บันทึกไม่สำเร็จ: ' + e.message);
+        msg('⚠️ บันทึกไม่สำเร็จ: ' + friendlyFetchError(e), true);
+        alert('บันทึกไม่สำเร็จ: ' + friendlyFetchError(e));
       }
     })
     .then(function () { busy = false; });
@@ -437,7 +442,7 @@ function trySyncQueue() {
       if (!isNetworkError(e)) {
         /* server ปฏิเสธทั้งที่ต่อเน็ตได้ (เช่น id ผิด/สิทธิ์ไม่ผ่าน) -> ตัดออกจากคิวกันค้างวนซ้ำตลอดไป */
         setQueue(getQueue().slice(1));
-        msg('⚠️ ซิงก์รายการหนึ่งไม่สำเร็จ (' + e.message + ') ข้ามไปก่อน', true);
+        msg('⚠️ ซิงก์รายการหนึ่งไม่สำเร็จ (' + friendlyFetchError(e) + ') ข้ามไปก่อน', true);
       }
       /* ถ้ายังออฟไลน์อยู่ ปล่อยคิวไว้เหมือนเดิม รอบถัดไปจะลองใหม่เอง */
     });
@@ -639,7 +644,7 @@ function loadHistory() {
         : '<div style="font-size:12px;opacity:.6">ยังไม่มีประวัติ</div>';
     })
     .catch(function (e) {
-      list.innerHTML = '<div style="font-size:12px;color:#b91c1c">โหลดประวัติไม่สำเร็จ: ' + esc(e.message) + '</div>';
+      list.innerHTML = '<div style="font-size:12px;color:#b91c1c">โหลดประวัติไม่สำเร็จ: ' + esc(friendlyFetchError(e)) + '</div>';
     });
 }
 
