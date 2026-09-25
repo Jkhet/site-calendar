@@ -229,12 +229,13 @@ function isAuthError(j) {
   return j && j.ok === false && (j.error === 'session_expired' || j.error === 'unauthorized');
 }
 function forceRelogin() {
+  alert('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่ (ถ้ากำลังกรอกฟอร์มค้างอยู่ ข้อมูลที่ยังไม่ได้บันทึกจะหายไป)');
   localStorage.removeItem('myName');
   localStorage.removeItem('sessionToken');
   location.reload();
 }
 
-/* ============ เข้าสู่ระบบ: ชื่อ+รหัสผ่าน เช็คกับ backend (ใช้ได้ทุกเครื่อง/เบราว์เซอร์ ไม่ใช่แค่เครื่องเดิม) ============ */
+/* ============ เข้าสู่ระบบ: กรอกชื่อ เช็ค/ออก session กับ backend (ใช้ได้ทุกเครื่อง/เบราว์เซอร์ ไม่ใช่แค่เครื่องเดิม) ============ */
 function doLogin() {
   var name = document.getElementById('lg_name').value.trim();
   var msgEl = document.getElementById('lgMsg');
