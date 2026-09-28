@@ -76,11 +76,68 @@ label{font-size:11.5px;font-weight:600;letter-spacing:.2px;color:var(--muted);di
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-icon{opacity:.35;margin-bottom:6px}
 footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;letter-spacing:.2px}
-@media(max-width:640px){.day{min-height:58px}.ev{font-size:9.5px}.grid2{grid-template-columns:1fr}body{padding:8px}}
-@media print{.bar,.nav button,header,footer{display:none}#tableCard{display:block !important}}
+.layout{max-width:1480px;margin:0 auto;display:flex;gap:14px;align-items:flex-start}
+.layout .wrap{flex:1;min-width:0;max-width:none;margin:0}
+.side{width:248px;flex-shrink:0;position:sticky;top:10px;max-height:calc(100vh - 20px);overflow-y:auto;background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:14px}
+.side-add{width:100%;padding:11px 14px;font-size:14px;font-weight:600;border-radius:10px;box-shadow:0 2px 6px rgba(40,90,72,.3)}
+.side-sec{border-top:1px solid var(--line);padding-top:12px}
+.side-title{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.tools{display:flex;flex-direction:column;gap:5px}
+.tool{width:100%;text-align:left;display:flex;align-items:center;gap:9px;padding:8px 10px}
+.tool .ti{width:18px;text-align:center}
+.side label{margin:9px 0 3px}
+.side .queue-badge{margin-top:8px;text-align:center}
+.side-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.me{display:flex;align-items:center;gap:9px}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.me-name{font-weight:600;font-size:13px;line-height:1.25;word-break:break-all}
+.me-sub{font-size:10.5px;color:var(--muted)}
+@media(max-width:900px){.layout{flex-direction:column;align-items:stretch}.side{width:100%;position:static;max-height:none}.tools{flex-direction:row;flex-wrap:wrap}.tool{width:auto}}
+@media(max-width:640px){.day{min-height:58px}.ev{font-size:9.5px}.grid2{grid-template-columns:1fr}body{padding:8px}.side-add{display:none}}
+@media print{.bar,.nav button,header,footer,.side{display:none}.layout{display:block}#tableCard{display:block !important}}
 </style>
 </head>
 <body>
+<div class="layout">
+
+<aside class="side">
+  <button class="primary side-add" onclick="openForm()">＋ เพิ่มรายการ</button>
+
+  <div class="side-sec">
+    <div class="side-title">เครื่องมือ</div>
+    <div class="tools">
+      <button class="ghost tool" onclick="trySyncQueue();pull()"><span class="ti">🔄</span>รีเฟรช</button>
+      <button class="ghost tool" id="btnTable" onclick="toggleTable()"><span class="ti">📋</span>สรุปรายการ</button>
+      <button class="ghost tool" onclick="expCSV()"><span class="ti">⬇️</span>ส่งออก CSV</button>
+      <button class="ghost tool" onclick="window.print()"><span class="ti">🖨️</span>พิมพ์</button>
+      <button class="ghost tool" onclick="share()"><span class="ti">🔗</span>คัดลอกลิงก์</button>
+    </div>
+    <span class="queue-badge" id="queueBadge"></span>
+  </div>
+
+  <div class="side-sec">
+    <div class="side-title">ค้นหาและกรอง</div>
+    <div style="position:relative">
+      <input id="fQ" type="text" autocomplete="off" placeholder="🔍 ค้นหา site / project / หมายเหตุ" oninput="draw()" style="padding-right:26px">
+      <button type="button" id="fQClear" onclick="clearSearch()" style="display:none;position:absolute;right:3px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 6px;line-height:1">✕</button>
+    </div>
+    <label>Project</label>
+    <select id="fP" onchange="draw()"><option value="">— All Project —</option></select>
+    <label>Site</label>
+    <select id="fS" onchange="draw()"><option value="">— All Site —</option></select>
+    <label>หัวหน้าทีม</label>
+    <select id="fL" onchange="draw()"><option value="">— All Team —</option></select>
+  </div>
+
+  <div class="side-foot">
+    <div class="me">
+      <span class="avatar" id="meAvatar">?</span>
+      <div><div class="me-name" id="meLabel"></div><div class="me-sub">ผู้ใช้งานปัจจุบัน</div></div>
+    </div>
+    <button class="ghost tool" onclick="doLogout()" id="btnLogout"><span class="ti">🚪</span>ออกจากระบบ</button>
+  </div>
+</aside>
+
 <div class="wrap">
 <header>
   <h1>📅 Calendar All Project</h1>
@@ -95,27 +152,6 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
 <div id="ro"></div>
 <div class="stats" id="stats"></div>
 
-<div class="bar">
-  <button class="primary" onclick="openForm()">+ เพิ่มรายการ</button>
-  <button class="ghost" onclick="trySyncQueue();pull()">🔄 รีเฟรช</button>
-  <button class="ghost" onclick="share()">🔗 คัดลอกลิงก์</button>
-  <button class="ghost" onclick="expCSV()">⬇️ CSV</button>
-  <button class="ghost" onclick="window.print()">🖨️ พิมพ์</button>
-  <button class="ghost" id="btnTable" onclick="toggleTable()">📋 สรุปรายการ</button>
-  <span class="queue-badge" id="queueBadge"></span>
-  <button class="ghost" onclick="doLogout()" id="btnLogout" style="margin-left:auto">🚪 <span id="meLabel"></span></button>
-</div>
-
-<div class="bar">
-  <div style="position:relative;flex:1;min-width:180px;max-width:280px">
-    <input id="fQ" type="text" autocomplete="off" placeholder="🔍 ค้นหา site / project / หัวหน้าทีม / หมายเหตุ" oninput="draw()" style="padding-right:26px">
-    <button type="button" id="fQClear" onclick="clearSearch()" style="display:none;position:absolute;right:3px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--muted);font-size:15px;cursor:pointer;padding:2px 6px;line-height:1">✕</button>
-  </div>
-  <select id="fP" onchange="draw()" style="max-width:200px"><option value="">— All Project —</option></select>
-  <select id="fS" onchange="draw()" style="max-width:180px"><option value="">— All Site —</option></select>
-  <select id="fL" onchange="draw()" style="max-width:180px"><option value="">— All Team —</option></select>
-</div>
-
 <div class="card">
   <div class="nav">
     <button class="ghost" onclick="mv(-1)">‹ ก่อนหน้า</button>
@@ -128,6 +164,7 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
 <div class="card" id="tableCard" style="display:none">
   <h2 style="font-size:16px;margin-bottom:10px">📋 รายการทั้งหมดในเดือนนี้</h2>
   <div style="overflow-x:auto"><table id="tb"></table></div>
+</div>
 </div>
 </div>
 
@@ -539,7 +576,7 @@ function toggleTable() {
   var btn = document.getElementById('btnTable');
   var show = card.style.display === 'none';
   card.style.display = show ? '' : 'none';
-  btn.textContent = show ? '📋 ซ่อนรายการ' : '📋 สรุปรายการ';
+  btn.innerHTML = '<span class="ti">📋</span>' + (show ? 'ซ่อนรายการ' : 'สรุปรายการ');
   if (show) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -781,6 +818,7 @@ function expCSV() {
 /* ============ เริ่มทำงาน + ซิงก์อัตโนมัติ (เรียกหลังล็อกอินสำเร็จเท่านั้น) ============ */
 function initApp() {
   document.getElementById('meLabel').textContent = ME;
+  document.getElementById('meAvatar').textContent = (ME || '?').charAt(0).toUpperCase();
   draw();
   renderQueueBadge();
   trySyncQueue(); // เผื่อมีรายการค้างจากตอนปิดแท็บครั้งก่อนตอนออฟไลน์ (ต้องมาก่อน pull())
