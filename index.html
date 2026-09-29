@@ -296,9 +296,19 @@ cur.setDate(1);
 var ME = localStorage.getItem('myName');
 var SESSION = localStorage.getItem('sessionToken');
 
-/* ============ ช่วยตรวจ session หมดอายุ/ไม่ถูกต้อง -> บังคับกลับไปหน้าล็อกอิน ============ */
+/* ============ ช่วยตรวจ session หมดอายุ/ไม่ถูกต้อง -> บังคับกลับไปหน้าล็อกอิน
+   (ต้องพลาดติดต่อกันหลายครั้งก่อนถึงจะบังคับออก กันปัญหาเน็ตสะดุด/error ชั่วคราวครั้งเดียว
+   ทำให้ถูกเด้งออกจากระบบทั้งที่ session ยังใช้ได้อยู่จริง — โดยเฉพาะ ping สถานะออนไลน์ที่ยิงถี่ทุก 15 วิ) ============ */
+var authFailStreak = 0;
+var AUTH_FAIL_LIMIT = 2;
 function isAuthError(j) {
   return j && j.ok === false && (j.error === 'session_expired' || j.error === 'unauthorized');
+}
+function noteAuthOk() { authFailStreak = 0; }
+function noteAuthFail() {
+  authFailStreak++;
+  if (authFailStreak >= AUTH_FAIL_LIMIT) { forceRelogin(); return true; }
+  return false;
 }
 function forceRelogin() {
   alert('เซสชันหมดอายุหรือไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่ (ถ้ากำลังกรอกฟอร์มค้างอยู่ ข้อมูลที่ยังไม่ได้บันทึกจะหายไป)');
@@ -389,8 +399,9 @@ function pull(silent) {
   fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&session=' + encodeURIComponent(SESSION) + '&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (j) {
-      if (isAuthError(j)) { forceRelogin(); return; }
+      if (isAuthError(j)) { if (noteAuthFail()) return; throw new Error(j.error); }
       if (!j.ok) throw new Error(j.error);
+      noteAuthOk();
       data = j.data;
       reapplyQueue(); // มีรายการค้างซิงก์อยู่ในคิว -> ทับข้อมูลสดจาก server ด้วยของที่ยังไม่ได้ซิงก์ กันไม่ให้หายไปจากจอชั่วคราว
       msg('', false);
@@ -467,8 +478,16 @@ function push(action, payload) {
   })
     .then(function (r) { return r.json(); })
     .then(function (j) {
-      if (isAuthError(j)) { forceRelogin(); return; }
+      if (isAuthError(j)) {
+        noteAuthFail(); // ถ้าพลาดซ้ำจนครบเกณฑ์ จะ forceRelogin() เอง แต่ระหว่างนี้กันข้อมูลหายไว้ก่อนด้วยการเข้าคิวเหมือนออฟไลน์
+        queueAction(body);
+        applyOptimistic(body);
+        msg('📴 เชื่อมต่อไม่สำเร็จชั่วคราว — บันทึกไว้ในเครื่องแล้ว จะลองใหม่อัตโนมัติ', true);
+        draw();
+        return;
+      }
       if (!j.ok) throw new Error(j.error);
+      noteAuthOk();
       data = j.data;
       msg('', false);
       draw();
@@ -506,8 +525,9 @@ function trySyncQueue() {
   })
     .then(function (r) { return r.json(); })
     .then(function (j) {
-      if (isAuthError(j)) { forceRelogin(); return; }
+      if (isAuthError(j)) { noteAuthFail(); busy = false; return; } // เก็บรายการไว้ในคิวต่อ ไม่ตัดทิ้ง รอบหน้าจะลองใหม่เอง
       if (!j.ok) throw new Error(j.error);
+      noteAuthOk();
       data = j.data;
       setQueue(getQueue().slice(1));
       busy = false;
@@ -534,7 +554,7 @@ function pingPresence() {
     body: JSON.stringify({ token: TOKEN, session: SESSION, action: 'ping' })
   })
     .then(function (r) { return r.json(); })
-    .then(function (j) { if (j.ok) renderPresence(j.online || []); else if (isAuthError(j)) forceRelogin(); })
+    .then(function (j) { if (j.ok) { noteAuthOk(); renderPresence(j.online || []); } else if (isAuthError(j)) { noteAuthFail(); } })
     .catch(function () { /* เงียบไว้ ไม่รบกวนการทำงานหลัก */ });
 }
 
@@ -731,8 +751,9 @@ function loadHistory() {
   fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&session=' + encodeURIComponent(SESSION) + '&action=audit&id=' + encodeURIComponent(editId) + '&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (j) {
-      if (isAuthError(j)) { forceRelogin(); return; }
+      if (isAuthError(j)) { if (noteAuthFail()) return; throw new Error(j.error); }
       if (!j.ok) throw new Error(j.error);
+      noteAuthOk();
       var LBL = { save: 'บันทึก/แก้ไข', delete: 'ลบ' };
       list.innerHTML = j.data.length
         ? j.data.map(function (h) {
@@ -801,8 +822,9 @@ function save() {
   fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&session=' + encodeURIComponent(SESSION) + '&t=' + Date.now())
     .then(function (r) { return r.json(); })
     .then(function (j) {
-      if (isAuthError(j)) { forceRelogin(); return; }
+      if (isAuthError(j)) { if (noteAuthFail()) return; throw new Error(j.error); }
       if (!j.ok) throw new Error(j.error);
+      noteAuthOk();
       data = j.data;
       reapplyQueue();
       var latest = null;
