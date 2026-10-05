@@ -466,6 +466,17 @@ function reapplyQueue() {
   getQueue().forEach(function (body) { applyOptimistic(body); });
 }
 
+/* backend ตอนนี้ตอบกลับเฉพาะแถวที่เปลี่ยนจริง (ไม่ใช่ทั้งชีต) เพื่อความเร็ว -> ต้อง merge เข้ากับ data ที่มีอยู่แทนการแทนที่ทั้งก้อน */
+function mergeServerResult(j, action) {
+  if (action === 'delete') {
+    if (j.deletedId) data = data.filter(function (d) { return d.id !== j.deletedId; });
+  } else if (action === 'saveMany') {
+    (j.rows || []).forEach(function (row) { upsertLocal(row); });
+  } else if (j.row) {
+    upsertLocal(j.row);
+  }
+}
+
 function push(action, payload) {
   msg('กำลังบันทึกลงส่วนกลาง...', true, true);
   busy = true;
@@ -488,7 +499,7 @@ function push(action, payload) {
       }
       if (!j.ok) throw new Error(j.error);
       noteAuthOk();
-      data = j.data;
+      mergeServerResult(j, action);
       msg('', false);
       draw();
     })
@@ -528,7 +539,7 @@ function trySyncQueue() {
       if (isAuthError(j)) { noteAuthFail(); busy = false; return; } // เก็บรายการไว้ในคิวต่อ ไม่ตัดทิ้ง รอบหน้าจะลองใหม่เอง
       if (!j.ok) throw new Error(j.error);
       noteAuthOk();
-      data = j.data;
+      mergeServerResult(j, next.action);
       setQueue(getQueue().slice(1));
       busy = false;
       if (getQueue().length) { trySyncQueue(); } else { msg('', false); draw(); }
