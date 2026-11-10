@@ -33,6 +33,17 @@ header p{opacity:.82;font-size:12px;font-weight:300;letter-spacing:.2px;margin-t
 .history{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;display:none}
 .history .h-row{font-size:12px;padding:4px 0;border-bottom:1px dashed var(--line);color:var(--muted)}
 .history .h-row b{color:var(--ink)}
+.bulk-info{display:none;font-size:12px;margin-top:10px;padding:7px 10px;border-radius:8px;background:#ecfdf5;color:#166534}
+.bulk-info.warn{background:#fef3c7;color:#92400e}
+.bulk-info.err{background:#fee2e2;color:#b91c1c}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:12px;z-index:80;box-shadow:0 6px 18px rgba(0,0,0,.3);max-width:92vw}
+.toast.on{display:flex}
+.toast-btn{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;padding:4px 10px;border-radius:7px;font-size:12px;cursor:pointer;flex-shrink:0}
+.toast-btn:hover{background:rgba(255,255,255,.15)}
+.trash-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.trash-row .t-main{font-size:13px}
+.trash-row .t-sub{font-size:11px;color:var(--muted)}
+@media(max-width:640px){.toast{bottom:84px}}
 .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
 button{border:0;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:500;letter-spacing:.2px;cursor:pointer;font-family:inherit;transition:background .15s ease}
 .primary{background:var(--navy);color:#fff}.primary:hover{background:var(--navy-dark)}
@@ -119,7 +130,7 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
 }
 @media(max-width:900px){.layout{flex-direction:column;align-items:stretch}.side-wrap{position:static;width:100%}.side-toggle{display:none}.side{max-height:none}.tools{flex-direction:row;flex-wrap:wrap}.tool{width:auto}}
 @media(max-width:640px){.day{min-height:58px}.ev{font-size:9.5px}.grid2{grid-template-columns:1fr}body{padding:8px}.side-add{display:none}}
-@media print{.bar,.nav button,header,footer,.side-wrap{display:none}.layout{display:block}#tableCard{display:block !important}}
+@media print{.bar,.nav button,header,footer,.side-wrap,.toast{display:none}.layout{display:block}#tableCard{display:block !important}}
 </style>
 </head>
 <body>
@@ -143,6 +154,7 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
       <button class="ghost tool tool-refresh" onclick="trySyncQueue();pull()" title="รีเฟรช"><span class="ti">🔄</span><span class="tl">รีเฟรช</span></button>
       <button class="ghost tool" id="btnTable" onclick="toggleTable()" title="สรุปรายการ"><span class="ti">📋</span><span class="tl">สรุปรายการ</span></button>
       <button class="ghost tool" onclick="expCSV()" title="ส่งออก CSV"><span class="ti">⬇️</span><span class="tl">ส่งออก CSV</span></button>
+      <button class="ghost tool" onclick="openTrash()" title="ถังขยะ (กู้รายการที่ลบ)"><span class="ti">🗑️</span><span class="tl">ถังขยะ</span></button>
       <button class="ghost tool" onclick="window.print()" title="พิมพ์"><span class="ti">🖨️</span><span class="tl">พิมพ์</span></button>
       <button class="ghost tool" onclick="share()" title="คัดลอกลิงก์"><span class="ti">🔗</span><span class="tl">คัดลอกลิงก์</span></button>
       <button class="ghost tool rail-only tool-filter" onclick="toggleSide(true)" title="ค้นหาและกรอง (กดเพื่อขยายแถบ)"><span class="ti">🔍</span></button>
@@ -201,44 +213,59 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
 
 <button class="fab" onclick="openForm()" aria-label="เพิ่มรายการ">+</button>
 
+<div class="toast" id="toast"><span id="toastMsg"></span><button class="toast-btn" id="toastBtn" onclick="toastAction()"></button></div>
+
 <div class="modal" id="modal">
  <div class="box">
   <h2 style="font-size:18px;margin-bottom:6px" id="mTitle">เพิ่มรายการเข้า Site</h2>
   <div class="grid2">
-    <div><label>วันที่ *</label><input type="date" id="f_date"></div>
+    <div><label>วันที่ *</label><input type="date" id="f_date" onchange="updateBulkInfo()"></div>
     <div><label>สถานะ</label><select id="f_status">
       <option>วางแผน</option><option>กำลังดำเนินการ</option><option>เสร็จสิ้น</option><option>เลื่อน</option>
     </select></div>
     <div><label>เวลาเข้า</label><input type="time" id="f_in" value="08:30"></div>
     <div><label>เวลาออก</label><input type="time" id="f_out" value="17:00"></div>
   </div>
-  <label>ชื่อ Project *</label><input id="f_proj" placeholder="เช่น The Flash">
+  <label>ชื่อ Project *</label><input id="f_proj" list="dl_proj" autocomplete="off" placeholder="เช่น The Flash">
   <div class="grid2">
-    <div><label>ชื่อ Site *</label><input id="f_site" placeholder="เช่น Site ABC1234"></div>
-    <div><label>หัวหน้าทีม *</label><input id="f_lead" placeholder="เช่น คุณสมชาย"></div>
+    <div id="siteWrap"><label>ชื่อ Site *</label><input id="f_site" list="dl_site" autocomplete="off" placeholder="เช่น Site ABC1234"></div>
+    <div><label>หัวหน้าทีม *</label><input id="f_lead" list="dl_lead" autocomplete="off" placeholder="เช่น คุณสมชาย"></div>
     <div><label>จำนวนทีม (คน)</label><input type="number" id="f_num" value="1" min="1"></div>
     <div><label>ประเภทงาน</label><select id="f_type">
       <option>ติดตั้ง</option><option>ตรวจสอบ</option><option>ซ่อมบำรุง</option><option>สำรวจ</option><option>อื่นๆ</option>
     </select></div>
   </div>
+  <div id="bulkWrap">
+    <label style="display:flex;align-items:center;gap:6px;margin-top:10px;cursor:pointer">
+      <input type="checkbox" id="f_bulk" onchange="toggleBulk()" style="width:auto">
+      เพิ่มหลาย site พร้อมกัน (วางรายชื่อ site หลายอัน)
+    </label>
+    <div class="repeat-box" id="bulkBox">
+      <label style="margin-top:0">รายชื่อ Site — 1 บรรทัดต่อ 1 site (หรือคั่นด้วย , ) วางจาก Excel ได้เลย</label>
+      <textarea id="f_sites" rows="4" oninput="updateBulkInfo()" placeholder="BKCC523&#10;BKCC525&#10;BKCC526"></textarea>
+    </div>
+  </div>
+
   <label>หมายเหตุ</label><textarea id="f_note" rows="2"></textarea>
 
   <div id="repeatWrap">
     <label style="display:flex;align-items:center;gap:6px;margin-top:14px;cursor:pointer">
-      <input type="checkbox" id="f_repeat" onchange="repeatBox.style.display=f_repeat.checked?'block':'none'" style="width:auto">
+      <input type="checkbox" id="f_repeat" onchange="toggleRepeat()" style="width:auto">
       ตั้งเป็นงานประจำ (สร้างหลายวันพร้อมกัน)
     </label>
     <div class="repeat-box" id="repeatBox">
       <div class="grid2">
-        <div><label>ความถี่</label><select id="f_repeat_freq">
+        <div><label>ความถี่</label><select id="f_repeat_freq" onchange="updateBulkInfo()">
           <option value="daily">ทุกวัน</option>
           <option value="weekly">ทุกสัปดาห์</option>
           <option value="monthly">ทุกเดือน</option>
         </select></div>
-        <div><label>ทำซ้ำจนถึงวันที่</label><input type="date" id="f_repeat_until"></div>
+        <div><label>ทำซ้ำจนถึงวันที่</label><input type="date" id="f_repeat_until" onchange="updateBulkInfo()"></div>
       </div>
     </div>
   </div>
+
+  <div class="bulk-info" id="bulkInfo"></div>
 
   <div class="history" id="historyBox">
     <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">ประวัติการแก้ไข</div>
@@ -254,6 +281,8 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
  </div>
 </div>
 
+<datalist id="dl_proj"></datalist><datalist id="dl_site"></datalist><datalist id="dl_lead"></datalist>
+
 <div class="modal" id="dayModal">
  <div class="box">
   <h2 id="dayModalTitle" style="font-size:16px;margin-bottom:10px"></h2>
@@ -261,6 +290,15 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
   <div class="bar" style="margin-top:14px;justify-content:flex-end">
     <button class="ghost" onclick="closeDayModal()">ปิด</button>
   </div>
+ </div>
+</div>
+
+<div class="modal" id="trashModal">
+ <div class="box">
+  <h2 style="font-size:16px;margin-bottom:4px">🗑️ ถังขยะ</h2>
+  <p style="font-size:11.5px;color:var(--muted);margin-bottom:10px">รายการที่ลบจะมาอยู่ที่นี่ กด "กู้คืน" เพื่อนำกลับเข้าปฏิทิน (ล้างอัตโนมัติเมื่อเกิน 30 วัน)</p>
+  <div id="trashList" style="max-height:55vh;overflow:auto"></div>
+  <div class="bar" style="margin-top:12px;justify-content:flex-end"><button class="ghost" onclick="closeTrash()">ปิด</button></div>
  </div>
 </div>
 
@@ -447,7 +485,7 @@ function isNetworkError(e) {
 }
 function friendlyFetchError(e) {
   if (isNetworkError(e)) return 'ไม่มีการเชื่อมต่ออินเทอร์เน็ต หรือเข้าถึงเซิร์ฟเวอร์ไม่ได้';
-  if (e instanceof SyntaxError) return 'เซิร์ฟเวอร์ตอบกลับมาไม่ใช่ข้อมูลที่ถูกต้อง — มักเกิดจาก Apps Script ยังไม่ได้ deploy เวอร์ชันล่าสุด หรือตั้งค่าสิทธิ์การเข้าถึงไม่ถูกต้อง ลองเปิด URL ของ Apps Script ตรงๆ ในเบราว์เซอร์เพื่อตรวจสอบ';
+  if (e && e.name === 'SyntaxError') return 'เซิร์ฟเวอร์ตอบกลับมาไม่ใช่ข้อมูลที่ถูกต้อง — มักเกิดจาก Apps Script ยังไม่ได้ deploy เวอร์ชันล่าสุด หรือตั้งค่าสิทธิ์การเข้าถึงไม่ถูกต้อง ลองเปิด URL ของ Apps Script ตรงๆ ในเบราว์เซอร์เพื่อตรวจสอบ';
   return e.message;
 }
 
@@ -457,6 +495,8 @@ function applyOptimistic(body) {
     data = data.filter(function (d) { return d.id !== String(body.id); });
   } else if (body.action === 'saveMany') {
     (body.rows || []).forEach(function (row) { upsertLocal(row); });
+  } else if (body.action === 'restore') {
+    if (body.row) upsertLocal(body.row);
   } else {
     upsertLocal(body.row || body);
   }
@@ -481,9 +521,10 @@ function mergeServerResult(j, action) {
   }
 }
 
-function push(action, payload) {
+function push(action, payload, opts) {
   msg('กำลังบันทึกลงส่วนกลาง...', true, true);
   busy = true;
+  var done = function (j) { try { if (opts && opts.onOk) opts.onOk(j); } catch (e) {} }; // เรียกเมื่อทำสำเร็จ หรือเก็บเข้าคิว/แสดงผลในเครื่องแล้ว
   var body = { token: TOKEN, session: SESSION, action: action };
   for (var k in payload) body[k] = payload[k];
   fetch(API, {
@@ -499,6 +540,7 @@ function push(action, payload) {
         applyOptimistic(body);
         msg('📴 เชื่อมต่อไม่สำเร็จชั่วคราว — บันทึกไว้ในเครื่องแล้ว จะลองใหม่อัตโนมัติ', true);
         draw();
+        done();
         return;
       }
       if (!j.ok) throw new Error(j.error);
@@ -506,6 +548,7 @@ function push(action, payload) {
       mergeServerResult(j, action);
       msg('', false);
       draw();
+      done(j);
     })
     .catch(function (e) {
       if (isNetworkError(e)) {
@@ -513,6 +556,7 @@ function push(action, payload) {
         applyOptimistic(body);
         msg('📴 ออฟไลน์ — บันทึกไว้ในเครื่องแล้ว จะซิงก์ให้อัตโนมัติเมื่อเน็ตกลับมา', true);
         draw();
+        done();
       } else {
         msg('⚠️ บันทึกไม่สำเร็จ: ' + friendlyFetchError(e), true);
         alert('บันทึกไม่สำเร็จ: ' + friendlyFetchError(e));
@@ -559,7 +603,12 @@ function trySyncQueue() {
     });
 }
 
-function uid() { return Date.now() + '' + Math.floor(Math.random() * 999); }
+/* ID เป็นตัวเลขล้วนเสมอ (backend ตัดอักขระอื่นทิ้ง) — ส่วนสุ่มยาว 6 หลักคงที่ ชนกันยากกว่าเดิม ~1000 เท่า
+   และชุดที่สร้างพร้อมกัน (หลาย site / งานประจำ) ใช้ตัวนับต่อท้ายแบบคงที่ จึงไม่ชนกันเองแน่นอน */
+var MAX_BATCH = 400;
+function pad(n, w) { var s = String(n); while (s.length < w) s = '0' + s; return s; }
+function uid() { return Date.now() + '' + pad(Math.floor(Math.random() * 1e6), 6); }
+function makeIds(n) { var base = uid(), out = []; for (var i = 0; i < n; i++) out.push(base + pad(i, 3)); return out; }
 
 /* ============ สถานะออนไลน์ (ping ไป Apps Script ทุก 15 วิ, cache หมดอายุถ้าไม่ ping ต่อ) ============ */
 function pingPresence() {
@@ -619,6 +668,9 @@ function fillFilters() {
     el.innerHTML = el.options[0].outerHTML + opts.map(function (o) {
       return '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>';
     }).join('');
+    /* รายการแนะนำในช่องกรอก (ฟอร์มเพิ่ม/แก้ไข) ใช้ชุดค่าเดียวกัน กันพิมพ์สะกดต่างกัน */
+    var dl = document.getElementById('dl_' + pair[1]);
+    if (dl) dl.innerHTML = opts.map(function (o) { return '<option value="' + esc(o) + '">'; }).join('');
   });
 }
 function mv(n) { cur.setMonth(cur.getMonth() + n); draw(); }
@@ -746,8 +798,16 @@ function openForm(date, id) {
   repeatBox.style.display = 'none';
   f_repeat_until.value = '';
 
+  /* เพิ่มหลาย site พร้อมกัน ใช้ได้เฉพาะตอนเพิ่มรายการใหม่ */
+  bulkWrap.style.display = id ? 'none' : 'block';
+  f_bulk.checked = false;
+  bulkBox.style.display = 'none';
+  f_sites.value = '';
+  siteWrap.style.display = '';
+
   historyBox.style.display = 'none';
   historyList.innerHTML = '';
+  updateBulkInfo();
 
   modal.classList.add('on');
 }
@@ -769,7 +829,7 @@ function loadHistory() {
       if (isAuthError(j)) { if (noteAuthFail()) return; throw new Error(j.error); }
       if (!j.ok) throw new Error(j.error);
       noteAuthOk();
-      var LBL = { save: 'บันทึก/แก้ไข', delete: 'ลบ' };
+      var LBL = { save: 'บันทึก/แก้ไข', delete: 'ลบ (ย้ายไปถังขยะ)', restore: 'กู้คืน' };
       list.innerHTML = j.data.length
         ? j.data.map(function (h) {
             return '<div class="h-row"><b>' + esc(LBL[h.action] || h.action) + '</b> — ' + esc(h.time) + ' — โดย ' + esc(h.by || 'ไม่ระบุ') + '</div>';
@@ -796,40 +856,116 @@ function buildRecurrence(startDate, until, freq) {
   return out;
 }
 
+/* ============ ชื่อมาตรฐาน (กันสะสมชื่อซ้ำที่สะกด/ตัวพิมพ์ต่างกัน) ============ */
+function normSp(s) { return String(s == null ? '' : s).trim().replace(/\s+/g, ' '); }
+/* แผนที่ "ชื่อแบบไม่สนตัวพิมพ์/ช่องว่างซ้ำ" -> การสะกดที่พบบ่อยที่สุดในข้อมูลเดิม */
+function buildCanon(kind) {
+  var counts = Object.create(null);
+  data.forEach(function (e) {
+    var v = normSp(e[kind]); if (!v) return;
+    var k = v.toLowerCase(), c = counts[k] || (counts[k] = Object.create(null));
+    c[v] = (c[v] || 0) + 1;
+  });
+  var map = Object.create(null);
+  Object.keys(counts).forEach(function (k) {
+    var best = null, n = 0, c = counts[k];
+    Object.keys(c).forEach(function (v) { if (c[v] > n) { n = c[v]; best = v; } });
+    map[k] = best;
+  });
+  return map;
+}
+function canon(map, value) { var v = normSp(value); return v ? (map[v.toLowerCase()] || v) : ''; }
+
+/* ============ เพิ่มหลาย site / งานประจำ: วางแผนว่าจะสร้างอะไรบ้าง (ใช้ทั้งพรีวิวและตอนบันทึกจริง) ============ */
+function parseSites(text, map) {
+  var seen = Object.create(null), out = [];
+  String(text || '').split(/[\n\r,;\t]+/).forEach(function (x) {
+    var v = canon(map, x); if (!v) return;
+    var k = v.toLowerCase(); if (seen[k]) return; seen[k] = 1; out.push(v);
+  });
+  return out;
+}
+function planCreation() {
+  var cm = buildCanon('site');
+  var sites = f_bulk.checked ? parseSites(f_sites.value, cm) : (normSp(f_site.value) ? [canon(cm, f_site.value)] : []);
+  var dates = (f_repeat.checked && f_repeat_until.value && f_date.value)
+    ? buildRecurrence(f_date.value, f_repeat_until.value, f_repeat_freq.value)
+    : (f_date.value ? [f_date.value] : []);
+  var multi = sites.length * dates.length > 1;
+  var exist = Object.create(null);
+  data.forEach(function (e) { exist[String(e.site).toLowerCase() + '|' + e.date] = 1; });
+  var combos = [], skipped = 0;
+  sites.forEach(function (st) {
+    dates.forEach(function (d) {
+      if (multi && exist[st.toLowerCase() + '|' + d]) { skipped++; return; }   // site+วันที่ซ้ำกับที่มีอยู่แล้ว -> ข้าม กันกดซ้ำแล้วได้รายการซ้อน
+      combos.push({ site: st, date: d });
+    });
+  });
+  return { sites: sites, dates: dates, combos: combos, skipped: skipped, multi: multi };
+}
+function updateBulkInfo() {
+  var el = document.getElementById('bulkInfo');
+  if (editId || (!f_bulk.checked && !f_repeat.checked)) { el.style.display = 'none'; return; }
+  var p = planCreation(), n = p.combos.length, cls = 'bulk-info', txt;
+  if (!p.sites.length) { txt = 'ใส่รายชื่อ Site อย่างน้อย 1 รายการ'; cls += ' warn'; }
+  else if (!p.dates.length) { txt = 'ช่วงวันที่ไม่ถูกต้อง (วันสิ้นสุดต้องไม่ก่อนวันเริ่ม)'; cls += ' warn'; }
+  else {
+    txt = 'จะสร้าง ' + n + ' รายการ (' + p.sites.length + ' site × ' + p.dates.length + ' วัน)';
+    if (p.skipped) { txt += ' · ข้าม ' + p.skipped + ' รายการที่ site+วันที่ ซ้ำกับของเดิม'; cls += ' warn'; }
+    if (n > MAX_BATCH) { txt += ' · เกินขีดจำกัด ' + MAX_BATCH + ' รายการต่อครั้ง'; cls = 'bulk-info err'; }
+  }
+  el.className = cls; el.textContent = txt; el.style.display = 'block';
+}
+function toggleBulk() {
+  var on = f_bulk.checked;
+  bulkBox.style.display = on ? 'block' : 'none';
+  siteWrap.style.display = on ? 'none' : '';
+  updateBulkInfo();
+}
+function toggleRepeat() {
+  repeatBox.style.display = f_repeat.checked ? 'block' : 'none';
+  updateBulkInfo();
+}
+
 function save() {
   if (busy) return;
-  if (!f_date.value || !f_proj.value.trim() || !f_site.value.trim() || !f_lead.value.trim()) {
-    alert('กรุณากรอก วันที่ / Project / Site / หัวหน้าทีม');
+  var bulkOn = !editId && f_bulk.checked;
+  var siteText = bulkOn ? f_sites.value.trim() : f_site.value.trim();
+  if (!f_date.value || !f_proj.value.trim() || !siteText || !f_lead.value.trim()) {
+    alert(bulkOn ? 'กรุณากรอก วันที่ / Project / รายชื่อ Site / หัวหน้าทีม' : 'กรุณากรอก วันที่ / Project / Site / หัวหน้าทีม');
     return;
   }
+  var cmProj = buildCanon('proj'), cmLead = buildCanon('lead'), cmSite = buildCanon('site');
   var row = {
     id: editId || uid(),
     date: f_date.value, tin: f_in.value, tout: f_out.value,
-    proj: f_proj.value.trim(), site: f_site.value.trim(), lead: f_lead.value.trim(),
+    proj: canon(cmProj, f_proj.value), site: bulkOn ? '' : canon(cmSite, f_site.value), lead: canon(cmLead, f_lead.value),
     num: f_num.value, type: f_type.value, status: f_status.value, note: f_note.value.trim(),
     updatedBy: ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }),
     ts: Date.now()   // ใช้เรียง "เพิ่ง/แก้ล่าสุดอยู่บนสุด" ในปฏิทิน
   };
 
-  /* งานประจำ: สร้างหลายแถวพร้อมกัน ใช้ได้เฉพาะตอนเพิ่มรายการใหม่เท่านั้น */
-  if (!editId && f_repeat.checked && f_repeat_until.value) {
-    var dates = buildRecurrence(f_date.value, f_repeat_until.value, f_repeat_freq.value);
-    if (!dates.length) { alert('ช่วงวันที่ทำซ้ำไม่ถูกต้อง (วันสิ้นสุดต้องไม่ก่อนวันเริ่ม)'); return; }
-    var rows = dates.map(function (d, i) {
+  /* เพิ่มรายการใหม่: 1 รายการ / หลาย site / หลายวัน (งานประจำ) / หลาย site × หลายวัน */
+  if (!editId) {
+    var plan = planCreation();
+    if (!plan.sites.length) { alert('กรุณาใส่ชื่อ Site อย่างน้อย 1 รายการ'); return; }
+    if (!plan.dates.length) { alert('ช่วงวันที่ทำซ้ำไม่ถูกต้อง (วันสิ้นสุดต้องไม่ก่อนวันเริ่ม)'); return; }
+    var n = plan.combos.length;
+    if (n > MAX_BATCH) { alert('สร้างได้ครั้งละไม่เกิน ' + MAX_BATCH + ' รายการ (ตอนนี้ ' + n + ' รายการ) — ลดจำนวน site หรือช่วงวันที่ลง'); return; }
+    if (!n) { alert('ไม่มีรายการใหม่ให้สร้าง — ทุกคู่ site+วันที่ มีอยู่แล้ว'); return; }
+    if (n >= 10 && !confirm('จะสร้าง ' + n + ' รายการ (' + plan.sites.length + ' site × ' + plan.dates.length + ' วัน)' + (plan.skipped ? ' และข้าม ' + plan.skipped + ' รายการที่ซ้ำ' : '') + '\nยืนยันไหม?')) return;
+    var ids = makeIds(n);
+    var rows = plan.combos.map(function (c, i) {
       var rr = {};
       for (var k in row) rr[k] = row[k];
-      rr.id = uid() + i; // กันชนกันเวลาสร้างหลายแถวในมิลลิวินาทีเดียว
-      rr.date = d;
-      rr.ts = row.ts + i; // กันเสมอกันเป๊ะๆ ทุกแถว ให้เรียงลำดับคงที่ภายในชุดเดียวกัน
+      rr.id = ids[i]; rr.site = c.site; rr.date = c.date;
+      rr.ts = row.ts + i;   // กันเสมอกันเป๊ะๆ ให้เรียงลำดับคงที่ภายในชุดเดียวกัน
       return rr;
     });
     closeForm();
-    push('saveMany', { rows: rows });
+    if (rows.length === 1) push('save', { row: rows[0] }); else push('saveMany', { rows: rows });
     return;
   }
-
-  /* รายการใหม่ ไม่มีอะไรให้ชนกัน บันทึกได้เลย */
-  if (!editId) { closeForm(); push('save', { row: row }); return; }
 
   /* แก้ไขรายการเดิม -> เช็คก่อนว่าระหว่างที่เปิดฟอร์มอยู่ มีคนอื่นแก้ไป/ลบไปหรือยัง */
   busy = true;
@@ -870,12 +1006,73 @@ function save() {
     });
 }
 
-function del() {
-  if (!confirm('ลบรายการนี้? (ทุกคนในทีมจะเห็นผล)')) return;
-  var id = editId;
-  closeForm();
-  push('delete', { id: id, by: ME });
+/* ============ ลบ = ย้ายไปถังขยะ + ปุ่ม "เลิกลบ" ============ */
+var lastDeleted = null, toastTimer = null, toastFn = null;
+function showToast(text, label, fn, ms) {
+  clearTimeout(toastTimer);
+  document.getElementById('toastMsg').textContent = text;
+  document.getElementById('toastBtn').textContent = label;
+  toastFn = fn;
+  document.getElementById('toast').classList.add('on');
+  toastTimer = setTimeout(hideToast, ms || 8000);
 }
+function hideToast() { clearTimeout(toastTimer); toastFn = null; document.getElementById('toast').classList.remove('on'); }
+function toastAction() { var f = toastFn; hideToast(); if (f) f(); }
+
+function del() {
+  if (!confirm('ลบรายการนี้? (ย้ายไปถังขยะ กู้คืนได้ — ทุกคนในทีมจะเห็นผล)')) return;
+  var id = editId, snapshot = null;
+  for (var i = 0; i < data.length; i++) if (data[i].id === id) snapshot = JSON.parse(JSON.stringify(data[i]));
+  closeForm();
+  push('delete', { id: id, by: ME }, { onOk: function () {
+    if (snapshot) { lastDeleted = snapshot; showToast('ลบ ' + snapshot.site + ' (' + snapshot.date + ') แล้ว', 'เลิกลบ', undoDelete, 10000); }
+  } });
+}
+function undoDelete() {
+  if (!lastDeleted) return;
+  var row = lastDeleted; lastDeleted = null;
+  push('restore', { id: row.id, row: row });
+}
+
+/* ============ ถังขยะ: ดูรายการที่ถูกลบ + กู้คืน ============ */
+var trashItems = [];
+function openTrash() {
+  var list = document.getElementById('trashList');
+  document.getElementById('trashModal').classList.add('on');
+  list.innerHTML = '<div style="font-size:12px;opacity:.6">กำลังโหลด...</div>';
+  fetch(API + '?token=' + encodeURIComponent(TOKEN) + '&session=' + encodeURIComponent(SESSION) + '&action=trash&t=' + Date.now())
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (isAuthError(j)) { if (noteAuthFail()) return; throw new Error(j.error); }
+      if (!j.ok) throw new Error(j.error);
+      noteAuthOk();
+      trashItems = j.data || [];
+      renderTrash();
+    })
+    .catch(function (e) {
+      list.innerHTML = '<div style="font-size:12px;color:#b91c1c">โหลดถังขยะไม่สำเร็จ: ' + esc(friendlyFetchError(e)) + '</div>';
+    });
+}
+function renderTrash() {
+  var list = document.getElementById('trashList');
+  list.innerHTML = trashItems.length ? trashItems.map(function (t) {
+    return '<div class="trash-row"><div><div class="t-main"><b>' + esc(t.site) + '</b> · ' + esc(t.date) + ' · ' + esc(t.lead) + ' · ' + esc(t.proj) +
+      '</div><div class="t-sub">ลบโดย ' + esc(t.deletedBy || 'ไม่ระบุ') + ' เมื่อ ' + esc(t.deletedAt) + '</div></div>' +
+      '<button class="ghost" onclick="restoreFromTrash(\'' + esc(t.id) + '\')">กู้คืน</button></div>';
+  }).join('') : '<div style="font-size:12px;opacity:.6;padding:8px 0">ถังขยะว่างเปล่า</div>';
+}
+function restoreFromTrash(id) {
+  var item = null;
+  trashItems.forEach(function (t) { if (t.id === id) item = t; });
+  if (!item) return;
+  var row = {};
+  for (var k in item) if (k !== 'deletedAt' && k !== 'deletedBy') row[k] = item[k];
+  push('restore', { id: id, row: row }, { onOk: function () {
+    trashItems = trashItems.filter(function (t) { return t.id !== id; });
+    renderTrash();
+  } });
+}
+function closeTrash() { document.getElementById('trashModal').classList.remove('on'); }
 
 /* ============ ส่งออก / แชร์ ============ */
 function share() {
@@ -912,9 +1109,11 @@ function initApp() {
   pingPresence();
   setInterval(function () {
     trySyncQueue(); // ต้องมาก่อน pull() เสมอ ไม่งั้น pull() จะตั้ง busy=true ก่อน ทำให้ trySyncQueue ถูกข้ามทุกรอบ
-    if (!busy && !modal.classList.contains('on')) pull(true);
+    /* แท็บถูกซ่อน (สลับไปแท็บอื่น/ย่อหน้าต่าง) = ไม่มีใครมองหน้าจอ ไม่ต้องดึงข้อมูล/ping ให้เปลืองคำขอ
+       พอกลับมาที่แท็บ visibilitychange ด้านล่างจะรีเฟรชให้ทันที — ส่วนคิวออฟไลน์ (trySyncQueue ด้านบน) ทำงานต่อเสมอ */
+    if (!document.hidden && !busy && !modal.classList.contains('on')) pull(true);
   }, 20000);
-  setInterval(pingPresence, 15000);
+  setInterval(function () { if (!document.hidden) pingPresence(); }, 15000);
   window.addEventListener('online', trySyncQueue);
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) {
