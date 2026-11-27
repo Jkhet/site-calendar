@@ -36,6 +36,54 @@ header p{opacity:.82;font-size:12px;font-weight:300;letter-spacing:.2px;margin-t
 .bulk-info{display:none;font-size:12px;margin-top:10px;padding:7px 10px;border-radius:8px;background:#ecfdf5;color:#166534}
 .bulk-info.warn{background:#fef3c7;color:#92400e}
 .bulk-info.err{background:#fee2e2;color:#b91c1c}
+.hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+.hint a{color:var(--navy);text-decoration:underline;cursor:pointer}
+.preset-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.p-label{font-size:11px;color:var(--muted);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;color:var(--ink);font-size:12px;font-weight:500;cursor:pointer;line-height:1.3}
+.chip:hover{border-color:var(--navy)}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip.add{border-style:dashed;color:var(--navy)}
+.chip b{margin-left:4px;opacity:.5;font-weight:400}
+.chip b:hover{opacity:1}
+.cp-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.cp-row.dup{opacity:.5}
+.cp-row .cp-d{color:var(--muted);font-size:11.5px;margin-left:auto;white-space:nowrap}
+.grid-box{max-width:1120px}
+.grid-wrap{overflow:auto;max-height:52vh;border:1px solid var(--line);border-radius:8px}
+#gridTb{width:max-content;min-width:100%;border-collapse:collapse;font-size:12.5px}
+#gridTb th{position:sticky;top:0;background:#f8fafc;z-index:2;padding:6px 6px;text-align:left;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
+#gridTb td{padding:0;border:1px solid var(--line)}
+#gridTb td.gn{padding:0 6px;text-align:center;color:var(--muted);font-size:11px;background:#fafafa;min-width:28px}
+#gridTb input,#gridTb select{width:100%;border:0;border-radius:0;padding:7px 6px;font-size:12.5px;background:transparent}
+#gridTb input:focus,#gridTb select:focus{outline:2px solid var(--teal);outline-offset:-2px;background:#fff}
+#gridTb td.gc-bad{background:#fee2e2}
+#gridTb tr.gc-dup td.gc{background:#fef3c7}
+#gridTb button.gx{border:0;background:transparent;color:var(--muted);padding:4px 8px;font-size:13px}
+#gridTb button.gx:hover{color:#b91c1c}
+.chip.dim{opacity:.62;border-style:dashed}
+.chip.bad{background:#fee2e2;border-color:#fca5a5;color:#b91c1c}
+.chip.static{cursor:default}
+.chip.static:hover{border-color:#cbd5e1}
+.chip.bad.static:hover{border-color:#fca5a5}
+.chips-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-height:46vh;overflow:auto;margin-top:10px}
+.qr-card{border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;break-inside:avoid;page-break-inside:avoid}
+.qr-card svg{width:100%;max-width:170px;height:auto}
+.qr-name{font-weight:700;font-size:15px;margin-top:4px;word-break:break-all}
+.qr-sub{font-size:10.5px;color:var(--muted)}
+.fab2{bottom:84px;width:44px;height:44px;line-height:42px;font-size:20px;background:#fff;color:var(--navy);border:1px solid #cbd5e1;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.fab2:hover{background:#f1f5f9}
+@keyframes sheetUp{from{transform:translateY(46px);opacity:.5}to{transform:none;opacity:1}}
+@media(max-width:640px){
+  .modal{align-items:flex-end;padding:0}
+  .modal .box{max-width:100%;width:100%;border-radius:18px 18px 0 0;max-height:92vh;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));animation:sheetUp .22s ease}
+  .modal .box.grid-box{max-height:96vh}
+  input,select,textarea{min-height:44px;font-size:16px}
+  #gridTb input,#gridTb select{min-height:36px;font-size:14px}
+  .chip{padding:8px 14px;font-size:13px}
+  .modal .bar button{min-height:42px}
+}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:12px;z-index:80;box-shadow:0 6px 18px rgba(0,0,0,.3);max-width:92vw}
 .toast.on{display:flex}
 .toast-btn{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;padding:4px 10px;border-radius:7px;font-size:12px;cursor:pointer;flex-shrink:0}
@@ -130,6 +178,14 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
 }
 @media(max-width:900px){.layout{flex-direction:column;align-items:stretch}.side-wrap{position:static;width:100%}.side-toggle{display:none}.side{max-height:none}.tools{flex-direction:row;flex-wrap:wrap}.tool{width:auto}}
 @media(max-width:640px){.day{min-height:58px}.ev{font-size:9.5px}.grid2{grid-template-columns:1fr}body{padding:8px}.side-add{display:none}}
+@media print{
+  body.qr-print>*:not(#qrModal){display:none !important}
+  body.qr-print #qrModal{display:block !important;position:static;background:none;padding:0}
+  body.qr-print #qrModal .box{box-shadow:none;max-width:none;max-height:none;overflow:visible;padding:0;animation:none}
+  body.qr-print #qrModal .box>*:not(#qr_out){display:none !important}
+  body.qr-print #qr_out{display:grid;grid-template-columns:repeat(3,1fr);max-height:none;overflow:visible}
+  body.qr-print .qr-card{border:1px solid #000}
+}
 @media print{.bar,.nav button,header,footer,.side-wrap,.toast{display:none}.layout{display:block}#tableCard{display:block !important}}
 </style>
 </head>
@@ -160,6 +216,16 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
       <button class="ghost tool rail-only tool-filter" onclick="toggleSide(true)" title="ค้นหาและกรอง (กดเพื่อขยายแถบ)"><span class="ti">🔍</span></button>
     </div>
     <span class="queue-badge" id="queueBadge"></span>
+  </div>
+
+  <div class="side-sec">
+    <div class="side-title">เพิ่มข้อมูลเร็ว</div>
+    <div class="tools">
+      <button class="ghost tool" onclick="openQuick()" title="พิมพ์บรรทัดเดียว เช่น BKCC523-528 นายประสิทธิ์ พรุ่งนี้ ติดตั้ง"><span class="ti">⚡</span><span class="tl">พิมพ์ด่วน</span></button>
+      <button class="ghost tool" onclick="openGrid()" title="กรอกหลายรายการเป็นตาราง (วางจาก Excel ได้)"><span class="ti">▦</span><span class="tl">กรอกเป็นตาราง</span></button>
+      <button class="ghost tool" onclick="openQr()" title="สร้าง/พิมพ์ป้าย QR ของ Site (สแกนแล้วเปิดฟอร์มพร้อมชื่อ Site)"><span class="ti">🔳</span><span class="tl">QR ของ Site</span></button>
+      <button class="ghost tool" onclick="openCopy()" title="คัดลอกแผนจากวัน/สัปดาห์อื่น"><span class="ti">📑</span><span class="tl">คัดลอกแผน</span></button>
+    </div>
   </div>
 
   <div class="side-sec side-filters">
@@ -212,12 +278,15 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
 <footer>ระบบจัดการงาน Site Visit · ข้อมูลส่วนกลางบน Google Sheets · v1.0</footer>
 
 <button class="fab" onclick="openForm()" aria-label="เพิ่มรายการ">+</button>
+<button class="fab fab2" onclick="openQuick()" aria-label="พิมพ์ด่วน" title="พิมพ์ด่วน">⚡</button>
 
 <div class="toast" id="toast"><span id="toastMsg"></span><button class="toast-btn" id="toastBtn" onclick="toastAction()"></button></div>
 
 <div class="modal" id="modal">
  <div class="box">
   <h2 style="font-size:18px;margin-bottom:6px" id="mTitle">เพิ่มรายการเข้า Site</h2>
+  <div id="presetBar" class="preset-bar"></div>
+  <div id="memHint" class="hint" style="display:none;margin:0 0 8px"></div>
   <div class="grid2">
     <div><label>วันที่ *</label><input type="date" id="f_date" onchange="updateBulkInfo()"></div>
     <div><label>สถานะ</label><select id="f_status">
@@ -226,15 +295,19 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
     <div><label>เวลาเข้า</label><input type="time" id="f_in" value="08:30"></div>
     <div><label>เวลาออก</label><input type="time" id="f_out" value="17:00"></div>
   </div>
+  <div class="chips-row"><span class="p-label">เวลา</span><span id="chipTime"></span></div>
+  <div class="chips-row"><span class="p-label">สถานะ</span><span id="chipStatus"></span></div>
   <label>ชื่อ Project *</label><input id="f_proj" list="dl_proj" autocomplete="off" placeholder="เช่น The Flash">
   <div class="grid2">
-    <div id="siteWrap"><label>ชื่อ Site *</label><input id="f_site" list="dl_site" autocomplete="off" placeholder="เช่น Site ABC1234"></div>
+    <div id="siteWrap"><label>ชื่อ Site *</label><input id="f_site" list="dl_site" autocomplete="off" placeholder="เช่น Site ABC1234"><div class="hint" id="autoHint"></div></div>
     <div><label>หัวหน้าทีม *</label><input id="f_lead" list="dl_lead" autocomplete="off" placeholder="เช่น คุณสมชาย"></div>
     <div><label>จำนวนทีม (คน)</label><input type="number" id="f_num" value="1" min="1"></div>
     <div><label>ประเภทงาน</label><select id="f_type">
       <option>ติดตั้ง</option><option>ตรวจสอบ</option><option>ซ่อมบำรุง</option><option>สำรวจ</option><option>อื่นๆ</option>
     </select></div>
   </div>
+  <div class="chips-row"><span class="p-label">ประเภทงาน</span><span id="chipType"></span></div>
+
   <div id="bulkWrap">
     <label style="display:flex;align-items:center;gap:6px;margin-top:10px;cursor:pointer">
       <input type="checkbox" id="f_bulk" onchange="toggleBulk()" style="width:auto">
@@ -273,6 +346,7 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
   </div>
 
   <div class="bar" style="margin-top:16px;justify-content:flex-end">
+    <button class="ghost" id="btnDup" onclick="duplicateCurrent()" style="display:none">📄 ทำสำเนา</button>
     <button class="ghost" id="btnHist" onclick="loadHistory()" style="display:none">🕘 ประวัติ</button>
     <button class="danger" id="btnDel" onclick="del()" style="display:none">ลบ</button>
     <button class="ghost" onclick="closeForm()">ยกเลิก</button>
@@ -289,6 +363,81 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
   <div id="dayModalList" style="display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto"></div>
   <div class="bar" style="margin-top:14px;justify-content:flex-end">
     <button class="ghost" onclick="closeDayModal()">ปิด</button>
+  </div>
+ </div>
+</div>
+
+<div class="modal" id="copyModal">
+ <div class="box">
+  <h2 style="font-size:16px;margin-bottom:4px">📑 คัดลอกแผน</h2>
+  <p class="hint" style="margin:0 0 8px">เลือกวัน/ช่วงที่ต้องการคัดลอก แล้วเลือกวันที่จะวางเริ่มต้น — สถานะจะตั้งเป็น "วางแผน" และไม่คัดลอกหมายเหตุ</p>
+  <div class="preset-bar">
+    <button class="chip" onclick="copyQuick('yesterday')">เมื่อวาน → วันนี้</button>
+    <button class="chip" onclick="copyQuick('lastweek')">สัปดาห์ที่แล้ว → สัปดาห์นี้</button>
+    <button class="chip" onclick="copyQuick('nextweek')">สัปดาห์นี้ → สัปดาห์หน้า</button>
+  </div>
+  <div class="grid2">
+    <div><label>คัดลอกจากวันที่</label><input type="date" id="cp_from" onchange="refreshCopy(true)"></div>
+    <div><label>ถึงวันที่</label><input type="date" id="cp_to" onchange="refreshCopy(true)"></div>
+  </div>
+  <label>วางเริ่มที่วันที่</label><input type="date" id="cp_target" onchange="refreshCopy(true)">
+  <div id="cp_list" style="max-height:34vh;overflow:auto;margin-top:10px"></div>
+  <div class="bulk-info" id="cp_info" style="display:block"></div>
+  <div class="bar" style="margin-top:14px;justify-content:flex-end">
+    <button class="ghost" onclick="closeCopy()">ยกเลิก</button>
+    <button class="primary" id="cp_btn" onclick="doCopy()">คัดลอก</button>
+  </div>
+ </div>
+</div>
+
+<div class="modal" id="gridModal">
+ <div class="box grid-box">
+  <h2 style="font-size:16px;margin-bottom:4px">▦ กรอกเป็นตาราง</h2>
+  <p class="hint" style="margin:0 0 8px">พิมพ์ หรือ <b>วางจาก Excel</b> (Ctrl+V) ได้เลย — วางหัวตารางมาด้วยก็ได้ ระบบจับคอลัมน์ให้ · Enter = ลงแถวถัดไป (ก๊อปค่าจากแถวบน) · Ctrl+D = เติมจากช่องบน · แถวที่ไม่ใส่ Site จะถูกข้าม</p>
+  <div class="grid-wrap"><table id="gridTb"></table></div>
+  <div class="bulk-info" id="gridInfo" style="display:block"></div>
+  <div class="bar" style="margin-top:12px">
+    <button class="ghost" onclick="gridAddRows(5)">＋ เพิ่ม 5 แถว</button>
+    <button class="ghost" onclick="gridClear()">ล้างตาราง</button>
+    <label style="margin:0 0 0 auto;display:flex;align-items:center;gap:6px;font-size:12px"><input type="checkbox" id="gridSkipDup" checked style="width:auto" onchange="gridValidate()"> ข้ามแถวที่ซ้ำ</label>
+    <button class="ghost" onclick="closeGrid()">ปิด</button>
+    <button class="primary" id="gridSave" onclick="gridSubmit()">บันทึกทั้งหมด</button>
+  </div>
+ </div>
+</div>
+
+<div class="modal" id="quickModal">
+ <div class="box">
+  <h2 style="font-size:16px;margin-bottom:4px">⚡ พิมพ์ด่วน</h2>
+  <p class="hint" style="margin:0 0 8px">พิมพ์บรรทัดเดียว เช่น <b>BKCC523-528 นายประสิทธิ์ พรุ่งนี้ ติดตั้ง</b> แล้วตรวจชิปด้านล่างก่อนกดสร้าง · ที่ไม่ได้พิมพ์จะใช้ค่าล่าสุดของคุณ (ชิปจางๆ)</p>
+  <div style="display:flex;gap:6px">
+    <input id="qa_text" autocomplete="off" placeholder="BKCC523-528 นายประสิทธิ์ พรุ่งนี้ 8.30-17.00 ติดตั้ง 2 คน" oninput="quickUpdate()" onkeydown="quickKey(event)" style="flex:1">
+    <button type="button" class="ghost" id="qa_mic" onclick="quickVoice()" title="พิมพ์ด้วยเสียง" style="display:none">🎤</button>
+  </div>
+  <div id="qa_chips" class="preset-bar" style="margin-top:10px"></div>
+  <div class="bulk-info" id="qa_info" style="display:block"></div>
+  <div class="bar" style="margin-top:12px;justify-content:flex-end">
+    <button class="ghost" onclick="closeQuick()">ปิด</button>
+    <button class="ghost" id="qa_form" onclick="quickToForm()">แก้ในฟอร์ม</button>
+    <button class="primary" id="qa_go" onclick="quickCreate()">สร้างเลย</button>
+  </div>
+ </div>
+</div>
+
+<div class="modal" id="qrModal">
+ <div class="box" style="max-width:760px">
+  <h2 style="font-size:16px;margin-bottom:4px">🔳 QR ของ Site</h2>
+  <p class="hint" style="margin:0 0 8px">พิมพ์ติดที่ไซต์ — สแกนแล้วเปิดแอปพร้อมเติมชื่อ Site ในฟอร์มเพิ่มรายการให้ (ต้องล็อกอินครั้งแรกบนเครื่องนั้น) ลิงก์ในคิวอาร์พาไปยังหน้านี้ ถ้าย้ายที่โฮสต์เว็บต้องสร้างป้ายใหม่</p>
+  <label style="margin-top:0">รายชื่อ Site (1 บรรทัดต่อ 1 site)</label>
+  <textarea id="qr_sites" rows="3" oninput="renderQr()" placeholder="BKCC523&#10;BKCC525"></textarea>
+  <div class="bar" style="margin-top:8px">
+    <button class="ghost" onclick="qrFillAll()">ใส่ทุก Site ที่มีในข้อมูล</button>
+    <span class="hint" id="qr_info" style="margin:0 0 0 auto"></span>
+  </div>
+  <div id="qr_out" class="qr-grid"></div>
+  <div class="bar" style="margin-top:12px;justify-content:flex-end">
+    <button class="ghost" onclick="closeQr()">ปิด</button>
+    <button class="primary" id="qr_print" onclick="printQr()">🖨️ พิมพ์ป้าย</button>
   </div>
  </div>
 </div>
@@ -314,6 +463,10 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:18px 4px 8px;
  </div>
 </div>
 
+<script>
+/*! qrcode-generator 2.0.4 | (c) 2009 Kazuhiko Arase | MIT license (http://www.opensource.org/licenses/mit-license.php) | 'QR Code' is a registered trademark of DENSO WAVE INCORPORATED */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
 <script>
 /* ============ ตั้งค่า ============ */
 var API = 'https://script.google.com/macros/s/AKfycbyqGs1aJdwZN21m357fzmCrR4Ei3lNf8EfB1dy5zxxr2ESoqkdzaX7bevqs9oJjCCQRVg/exec';
@@ -444,6 +597,7 @@ function pull(silent) {
       reapplyQueue(); // มีรายการค้างซิงก์อยู่ในคิว -> ทับข้อมูลสดจาก server ด้วยของที่ยังไม่ได้ซิงก์ กันไม่ให้หายไปจากจอชั่วคราว
       msg('', false);
       draw();
+      if (pendingLink) { var lk = pendingLink; pendingLink = null; openDeepLink(lk); }   // เปิดจาก QR/ลิงก์: รอข้อมูลโหลดก่อน จะได้เติมค่าจากครั้งล่าสุดของ site ได้
     })
     .catch(function (e) {
       /* รีเฟรชพื้นหลัง (silent) พลาดไปครั้งเดียวไม่ต้องขึ้นแบนเนอร์ใหญ่ให้ตกใจ — ข้อมูลเดิมบนจอยังถูกต้องใช้ได้
@@ -782,13 +936,14 @@ function openForm(date, id) {
   if (id) { for (var i = 0; i < data.length; i++) if (data[i].id === id) e = data[i]; }
   editSnapshot = snap(e);
   f_date.value = e ? e.date : (date || todayLocal());
-  f_in.value = e ? e.tin : '08:30';
-  f_out.value = e ? e.tout : '17:00';
-  f_proj.value = e ? e.proj : '';
+  var mem = id ? {} : loadMem();   // เพิ่มรายการใหม่: เติมค่าล่าสุดที่ผู้ใช้คนนี้เคยกรอกให้
+  f_in.value = e ? e.tin : (mem.tin || '08:30');
+  f_out.value = e ? e.tout : (mem.tout || '17:00');
+  f_proj.value = e ? e.proj : (mem.proj || '');
   f_site.value = e ? e.site : '';
-  f_lead.value = e ? e.lead : '';
-  f_num.value = e ? e.num : 1;
-  f_type.value = e ? e.type : 'ติดตั้ง';
+  f_lead.value = e ? e.lead : (mem.lead || '');
+  f_num.value = e ? e.num : (mem.num || 1);
+  f_type.value = e ? e.type : (mem.type || 'ติดตั้ง');
   f_status.value = e ? e.status : 'วางแผน';
   f_note.value = e ? e.note : '';
 
@@ -808,6 +963,16 @@ function openForm(date, id) {
   historyBox.style.display = 'none';
   historyList.innerHTML = '';
   updateBulkInfo();
+
+  formTouched = {};
+  autoHint.textContent = '';
+  btnDup.style.display = id ? 'inline-block' : 'none';
+  var hasMem = !id && Object.keys(mem).length > 0;
+  memHint.style.display = hasMem ? 'block' : 'none';
+  if (hasMem) memHint.innerHTML = 'เติมค่าล่าสุดของคุณให้แล้ว · <a onclick="clearMem()">ล้างค่าที่จำ</a>';
+  presetBar.style.display = id ? 'none' : 'flex';
+  if (!id) renderPresets();
+  syncChips();
 
   modal.classList.add('on');
 }
@@ -854,6 +1019,725 @@ function buildRecurrence(startDate, until, freq) {
   var out = [], cur = startDate, guard = 0;
   while (cur <= until && guard < 366) { out.push(cur); cur = addPeriod(cur, freq); guard++; }
   return out;
+}
+
+/* ============ ตัวช่วยวันที่ (สัปดาห์เริ่มวันจันทร์ ตรงกับปฏิทิน) ============ */
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function ymdOf(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function dateOf(s) { var p = String(s).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+function addDays(s, n) { var d = dateOf(s); d.setDate(d.getDate() + n); return ymdOf(d); }
+function diffDays(a, b) { return Math.round((dateOf(a) - dateOf(b)) / 86400000); }
+function mondayOf(s) { var d = dateOf(s); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return ymdOf(d); }
+
+/* ============ จำค่าล่าสุดของผู้ใช้แต่ละคน (เก็บในเครื่อง แยกตามชื่อที่ล็อกอิน) ============ */
+var formTouched = {};   // ช่องที่ผู้ใช้แก้เองในฟอร์มนี้ — เติมอัตโนมัติจะไม่ทับ
+function memKey() { return 'mem:' + (ME || ''); }
+function loadMem() { try { return JSON.parse(localStorage.getItem(memKey()) || '{}') || {}; } catch (e) { return {}; } }
+function saveMem(o) {
+  try {
+    var m = loadMem();
+    ['lead', 'proj', 'tin', 'tout', 'type', 'num'].forEach(function (k) { if (o[k] !== undefined && o[k] !== '') m[k] = o[k]; });
+    localStorage.setItem(memKey(), JSON.stringify(m));
+  } catch (e) {}
+}
+function clearMem() {
+  try { localStorage.removeItem(memKey()); } catch (e) {}
+  if (!editId) {
+    f_lead.value = ''; f_proj.value = ''; f_in.value = '08:30'; f_out.value = '17:00'; f_type.value = 'ติดตั้ง'; f_num.value = 1;
+    formTouched = {};
+  }
+  memHint.style.display = 'none';
+  syncChips();
+}
+
+/* ============ เลือก site แล้วเติม Project/หัวหน้า/ประเภท/จำนวนทีม จากครั้งล่าสุดที่เข้า site นั้น ============ */
+function latestFor(name) {
+  var k = String(name).toLowerCase(), best = null;
+  data.forEach(function (e) {
+    if (String(e.site).toLowerCase() !== k) return;
+    if (!best || e.date > best.date || (e.date === best.date && (e.ts || 0) > (best.ts || 0))) best = e;
+  });
+  return best;
+}
+function autofillFromSite() {
+  autoHint.textContent = '';
+  if (editId || f_bulk.checked) return;
+  var v = normSp(f_site.value); if (!v) return;
+  var name = buildCanon('site')[v.toLowerCase()]; if (!name) return;
+  var last = latestFor(name); if (!last) return;
+  var filled = 0;
+  [['f_proj', 'proj'], ['f_lead', 'lead'], ['f_type', 'type'], ['f_num', 'num']].forEach(function (p) {
+    if (!formTouched[p[0]] && last[p[1]]) { document.getElementById(p[0]).value = last[p[1]]; filled++; }
+  });
+  if (filled) autoHint.textContent = 'เติมจากครั้งล่าสุดของ ' + name + ' (' + last.date + ')';
+  syncChips();
+}
+
+/* ============ ชุดสำเร็จรูป (บันทึกชุดที่ใช้บ่อย แตะครั้งเดียวเติมทุกช่อง) ============ */
+var PRESET_MAX = 12;
+function presetKey() { return 'presets:' + (ME || ''); }
+function loadPresets() { try { var a = JSON.parse(localStorage.getItem(presetKey()) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function storePresets(a) { try { localStorage.setItem(presetKey(), JSON.stringify(a)); } catch (e) {} }
+function renderPresets() {
+  var list = loadPresets();
+  presetBar.innerHTML = '<span class="p-label">ชุดสำเร็จรูป</span>' + list.map(function (p, i) {
+    return '<button type="button" class="chip" onclick="applyPreset(' + i + ')">' + esc(p.name) + '<b onclick="event.stopPropagation();deletePreset(' + i + ')" title="ลบชุดนี้">✕</b></button>';
+  }).join('') + '<button type="button" class="chip add" onclick="savePresetFromForm()">＋ บันทึกชุดนี้</button>';
+}
+function applyPreset(i) {
+  var p = loadPresets()[i]; if (!p) return;
+  [['f_lead', p.lead], ['f_proj', p.proj], ['f_type', p.type], ['f_num', p.num], ['f_in', p.tin], ['f_out', p.tout]].forEach(function (x) {
+    if (x[1] !== undefined && x[1] !== '') { document.getElementById(x[0]).value = x[1]; formTouched[x[0]] = 1; }
+  });
+  memHint.style.display = 'block';
+  memHint.textContent = 'ใช้ชุด “' + p.name + '” แล้ว';
+  syncChips();
+}
+function savePresetFromForm() {
+  var lead = normSp(f_lead.value), proj = normSp(f_proj.value);
+  if (!lead && !proj) { alert('ใส่หัวหน้าทีมหรือ Project ก่อน แล้วค่อยบันทึกเป็นชุดสำเร็จรูป'); return; }
+  var name = prompt('ตั้งชื่อชุดสำเร็จรูปนี้', (lead || proj) + ' · ' + f_type.value);
+  if (name === null) return;
+  name = normSp(name).slice(0, 40); if (!name) return;
+  var list = loadPresets(), item = { name: name, lead: lead, proj: proj, type: f_type.value, num: f_num.value, tin: f_in.value, tout: f_out.value }, idx = -1;
+  list.forEach(function (p, i) { if (p.name.toLowerCase() === name.toLowerCase()) idx = i; });
+  if (idx >= 0) list[idx] = item;
+  else {
+    if (list.length >= PRESET_MAX) { alert('เก็บชุดสำเร็จรูปได้สูงสุด ' + PRESET_MAX + ' ชุด — ลบชุดเก่าก่อน'); return; }
+    list.push(item);
+  }
+  storePresets(list); renderPresets();
+}
+function deletePreset(i) {
+  var list = loadPresets(); if (!list[i]) return;
+  if (!confirm('ลบชุดสำเร็จรูป “' + list[i].name + '” ?')) return;
+  list.splice(i, 1); storePresets(list); renderPresets();
+}
+
+/* ============ ทำสำเนารายการที่เปิดอยู่ ============ */
+function duplicateCurrent() {
+  if (!editId) return;
+  var src = null; data.forEach(function (r) { if (r.id === editId) src = r; });
+  if (!src) return;
+  var c = JSON.parse(JSON.stringify(src));
+  closeForm(); openForm(c.date);
+  f_proj.value = c.proj; f_site.value = c.site; f_lead.value = c.lead; f_in.value = c.tin; f_out.value = c.tout;
+  f_num.value = c.num; f_type.value = c.type; f_note.value = c.note; f_status.value = 'วางแผน';
+  ['f_proj', 'f_lead', 'f_in', 'f_out', 'f_num', 'f_type'].forEach(function (id) { formTouched[id] = 1; });
+  memHint.style.display = 'block';
+  memHint.textContent = 'ทำสำเนาจาก ' + c.site + ' — เปลี่ยนวันที่/ข้อมูลที่ต้องการ แล้วกดบันทึก';
+  syncChips();
+}
+
+/* ============ คัดลอกแผน: คัดลอกรายการของวัน/สัปดาห์หนึ่งไปวางที่อีกวัน/สัปดาห์ ============ */
+var copyItems = [], copySel = {};
+function openCopy(kind) {
+  document.getElementById('copyModal').classList.add('on');
+  copyQuick(kind || 'yesterday');
+}
+function closeCopy() { document.getElementById('copyModal').classList.remove('on'); }
+function copyQuick(kind) {
+  var t = todayLocal(), from, to, tgt;
+  if (kind === 'lastweek') { from = addDays(mondayOf(t), -7); to = addDays(from, 6); tgt = mondayOf(t); }
+  else if (kind === 'nextweek') { from = mondayOf(t); to = addDays(from, 6); tgt = addDays(from, 7); }
+  else { from = addDays(t, -1); to = from; tgt = t; }
+  cp_from.value = from; cp_to.value = to; cp_target.value = tgt;
+  refreshCopy(true);
+}
+function refreshCopy(reset) {
+  var from = cp_from.value, to = cp_to.value || cp_from.value, tgt = cp_target.value;
+  var list = document.getElementById('cp_list');
+  if (!from || !tgt) { copyItems = []; list.innerHTML = ''; updateCopyInfo(); return; }
+  if (to < from) to = from;
+  var shift = diffDays(tgt, from), exist = Object.create(null);
+  data.forEach(function (e) { exist[String(e.site).toLowerCase() + '|' + e.date] = 1; });
+  copyItems = data.filter(function (e) { return e.date >= from && e.date <= to; })
+    .sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : a.site.localeCompare(b.site, 'th', { numeric: true }); })
+    .map(function (e) { var nd = addDays(e.date, shift); return { e: e, newDate: nd, dup: !!exist[String(e.site).toLowerCase() + '|' + nd] }; });
+  if (reset) { copySel = {}; copyItems.forEach(function (it) { copySel[it.e.id] = !it.dup; }); }
+  list.innerHTML = copyItems.length ? copyItems.map(function (it) {
+    return '<label class="cp-row' + (it.dup ? ' dup' : '') + '"><input type="checkbox" style="width:auto" data-id="' + esc(it.e.id) + '"' + (copySel[it.e.id] && !it.dup ? ' checked' : '') + (it.dup ? ' disabled' : '') + ' onchange="toggleCopyItem(this)">' +
+      '<b>' + esc(it.e.site) + '</b><span>' + esc(it.e.lead) + '</span><span class="cp-d">' + esc(it.e.date) + ' → ' + esc(it.newDate) + (it.dup ? ' · มีอยู่แล้ว' : '') + '</span></label>';
+  }).join('') : '<div class="hint" style="padding:8px 0">ไม่มีรายการในช่วงวันที่ที่เลือก</div>';
+  updateCopyInfo();
+}
+function toggleCopyItem(el) { copySel[el.getAttribute('data-id')] = el.checked; updateCopyInfo(); }
+function updateCopyInfo() {
+  var n = 0, dup = 0;
+  copyItems.forEach(function (it) { if (it.dup) dup++; else if (copySel[it.e.id]) n++; });
+  var el = document.getElementById('cp_info');
+  el.className = 'bulk-info' + (n > MAX_BATCH ? ' err' : dup ? ' warn' : '');
+  el.textContent = 'จะคัดลอก ' + n + ' รายการ' + (dup ? ' · ข้าม ' + dup + ' รายการที่ site+วันที่ ซ้ำกับของเดิม' : '') + (n > MAX_BATCH ? ' · เกินขีดจำกัด ' + MAX_BATCH + ' รายการต่อครั้ง' : '');
+  el.style.display = 'block';
+  document.getElementById('cp_btn').disabled = (n === 0 || n > MAX_BATCH);
+}
+function doCopy() {
+  var chosen = copyItems.filter(function (it) { return !it.dup && copySel[it.e.id]; });
+  if (!chosen.length) { alert('ไม่มีรายการให้คัดลอก'); return; }
+  if (chosen.length > MAX_BATCH) { alert('คัดลอกได้ครั้งละไม่เกิน ' + MAX_BATCH + ' รายการ'); return; }
+  var ids = makeIds(chosen.length), base = Date.now();
+  var stamp = ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+  var rows = chosen.map(function (it, i) {
+    var e = it.e;
+    return { id: ids[i], date: it.newDate, tin: e.tin, tout: e.tout, proj: e.proj, site: e.site, lead: e.lead, num: e.num, type: e.type, status: 'วางแผน', note: '', updatedBy: stamp, ts: base + i };
+  });
+  var n = rows.length;
+  push(n === 1 ? 'save' : 'saveMany', n === 1 ? { row: rows[0] } : { rows: rows }, { onOk: function () {
+    closeCopy();
+    showToast('คัดลอก ' + n + ' รายการแล้ว', 'ตกลง', null, 5000);
+  } });
+}
+
+/* ============ แปลงข้อมูล: วันที่/เวลา/ประเภท/สถานะ (ใช้ทั้งตารางและพิมพ์ด่วน) ============ */
+var TYPES = ['ติดตั้ง', 'ตรวจสอบ', 'ซ่อมบำรุง', 'สำรวจ', 'อื่นๆ'];
+var STATUSES = ['วางแผน', 'กำลังดำเนินการ', 'เสร็จสิ้น', 'เลื่อน'];
+function thDigits(s) { return String(s == null ? '' : s).replace(/[๐-๙]/g, function (c) { return String(c.charCodeAt(0) - 0x0E50); }); }
+function isRealYmd(y, m, d) { var t = new Date(y, m - 1, d); return t.getFullYear() === y && t.getMonth() === m - 1 && t.getDate() === d; }
+function fullYear(y, digits) {
+  if (digits <= 2) return y >= 40 ? 2500 + y - 543 : 2000 + y;   // ปี 2 หลัก: 40-99 = พ.ศ. (เช่น 69 = 2569 = 2026), 00-39 = ค.ศ. 20xx
+  return y > 2400 ? y - 543 : y;                                  // 4 หลัก: มากกว่า 2400 ถือเป็น พ.ศ.
+}
+/* รับรูปแบบที่เจอบ่อยใน Excel/ไทย -> 'YYYY-MM-DD' (ไม่ผ่าน = '') ; วัน/เดือน ลำดับแบบไทย (วัน/เดือน/ปี) */
+function parseDateFlexible(str, refYear) {
+  var s = thDigits(str).trim(), m, y, mo, d;
+  if (!s) return '';
+  if ((m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/))) { y = fullYear(+m[1], 4); mo = +m[2]; d = +m[3]; }
+  else if ((m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2}|\d{4})$/))) { d = +m[1]; mo = +m[2]; y = fullYear(+m[3], m[3].length); }
+  else if ((m = s.match(/^(\d{1,2})[-\/.](\d{1,2})$/))) { d = +m[1]; mo = +m[2]; y = refYear || new Date().getFullYear(); }
+  else return '';
+  return isRealYmd(y, mo, d) ? y + '-' + pad2(mo) + '-' + pad2(d) : '';
+}
+/* เวลา: 8.30 / 0830 / 8:30 / 8 -> HH:MM (ไม่ผ่าน = '') */
+function normTimeJS(v) {
+  var s = thDigits(v).trim(); if (!s) return '';
+  var m = s.replace(/[.\s]/g, ':').replace(/::+/g, ':').match(/^(\d{1,2}):?(\d{2})$/) || s.match(/^(\d{1,2})$/) && [0, s, '00'];
+  if (!m) return '';
+  var h = +m[1], mi = +m[2];
+  return (h > 23 || mi > 59) ? '' : pad2(h) + ':' + pad2(mi);
+}
+function fuzzyIn(v, list, rules) {
+  var s = normSp(v); if (!s) return '';
+  for (var i = 0; i < list.length; i++) if (s.toLowerCase() === list[i].toLowerCase()) return list[i];
+  for (var j = 0; j < rules.length; j++) if (rules[j][0].test(s.toLowerCase())) return rules[j][1];
+  return '';
+}
+function fuzzyType(v) { return fuzzyIn(v, TYPES, [[/ติดตั้ง|install/, 'ติดตั้ง'], [/ตรวจ|inspect|check/, 'ตรวจสอบ'], [/ซ่อม|บำรุง|maint|repair/, 'ซ่อมบำรุง'], [/สำรวจ|survey/, 'สำรวจ'], [/อื่น|other/, 'อื่นๆ']]); }
+function fuzzyStatus(v) { return fuzzyIn(v, STATUSES, [[/เสร็จ|done|complete|finish/, 'เสร็จสิ้น'], [/กำลัง|ดำเนิน|progress|wip|ongoing/, 'กำลังดำเนินการ'], [/เลื่อน|postpone|delay|cancel/, 'เลื่อน'], [/วางแผน|plan|pending|รอ/, 'วางแผน']]); }
+
+/* ============ อ่านข้อมูลที่ copy มาจาก Excel/Sheets (แยกด้วย Tab, ช่องที่มี " ครอบได้ รวมขึ้นบรรทัดใหม่ในช่อง) ============ */
+function parseTSV(text) {
+  var t = String(text).replace(/\r\n?/g, '\n'), rows = [], row = [], cur = '', q = false;
+  for (var i = 0; i < t.length; i++) {
+    var ch = t[i];
+    if (q) { if (ch === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+    else if (ch === '"' && cur === '') q = true;
+    else if (ch === '\t') { row.push(cur); cur = ''; }
+    else if (ch === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += ch;
+  }
+  if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+var GALIAS = {
+  date: ['วันที่', 'วัน', 'date'], site: ['site', 'ไซต์', 'ไซท์', 'ชื่อsite', 'รหัสsite', 'siteid', 'sitename'],
+  proj: ['project', 'proj', 'โครงการ', 'โปรเจกต์', 'โปรเจค', 'ชื่อproject'], lead: ['หัวหน้าทีม', 'หัวหน้า', 'lead', 'teamlead', 'leader'],
+  tin: ['เวลาเข้า', 'เข้า', 'in', 'timein', 'tin', 'start', 'เริ่ม'], tout: ['เวลาออก', 'ออก', 'out', 'timeout', 'tout', 'end', 'เลิก'],
+  num: ['จำนวนทีม', 'ทีม', 'จำนวน', 'num', 'คน', 'teamsize'], type: ['ประเภทงาน', 'ประเภท', 'type', 'งาน'],
+  status: ['สถานะ', 'status'], note: ['หมายเหตุ', 'note', 'notes', 'remark', 'remarks']
+};
+function headerMap(cells) {   // ถ้าแถวแรกดูเหมือนหัวตาราง (ตรงชื่อคอลัมน์ ≥ 2 ช่อง) -> คืนแผนที่ index -> ชื่อฟิลด์ ไม่ใช่ -> null
+  var map = [], hits = 0;
+  cells.forEach(function (h, i) {
+    var n = thDigits(h).toLowerCase().replace(/[\s().:_\-\/]/g, ''), found = null;
+    Object.keys(GALIAS).forEach(function (k) { GALIAS[k].forEach(function (a) { if (!found && (n === a || (a.length >= 3 && n.indexOf(a) === 0))) found = k; }); });
+    map[i] = found; if (found) hits++;
+  });
+  return hits >= 2 ? map : null;
+}
+
+/* ============ กรอกเป็นตาราง ============ */
+var GCOLS = [
+  { k: 'date', t: 'วันที่', ph: 'ปปปป-ดด-วว' }, { k: 'site', t: 'Site', list: 'dl_site' }, { k: 'proj', t: 'Project', list: 'dl_proj' },
+  { k: 'lead', t: 'หัวหน้าทีม', list: 'dl_lead' }, { k: 'tin', t: 'เข้า', ph: '08:30' }, { k: 'tout', t: 'ออก', ph: '17:00' },
+  { k: 'num', t: 'ทีม', ph: '1' }, { k: 'type', t: 'ประเภท', sel: TYPES }, { k: 'status', t: 'สถานะ', sel: STATUSES }, { k: 'note', t: 'หมายเหตุ' }
+];
+var GRID_MAX_ROWS = 1000;
+var gridRows = [];
+function gridDefaults(prev) {
+  var m = loadMem();
+  return {
+    date: prev ? prev.date : todayLocal(), site: '', proj: prev ? prev.proj : (m.proj || ''), lead: prev ? prev.lead : (m.lead || ''),
+    tin: prev ? prev.tin : (m.tin || '08:30'), tout: prev ? prev.tout : (m.tout || '17:00'), num: prev ? prev.num : String(m.num || 1),
+    type: prev ? prev.type : (m.type || 'ติดตั้ง'), status: prev ? prev.status : 'วางแผน', note: ''
+  };
+}
+function gnorm(k, v) {
+  v = String(v == null ? '' : v);
+  if (k === 'date') return parseDateFlexible(v) || normSp(v);
+  if (k === 'tin' || k === 'tout') return normTimeJS(v) || normSp(v);
+  if (k === 'num') { var n = thDigits(v).trim().match(/^\d+$/); return n ? String(parseInt(n[0], 10)) : normSp(v); }
+  if (k === 'type') return fuzzyType(v);
+  if (k === 'status') return fuzzyStatus(v);
+  return normSp(v);
+}
+function openGrid() {
+  if (!gridRows.length) { var r0 = gridDefaults(null); gridRows.push(r0); for (var i = 1; i < 5; i++) gridRows.push(gridDefaults(gridRows[i - 1])); }
+  document.getElementById('gridModal').classList.add('on');
+  renderGrid();
+  var first = 0; gridRows.forEach(function (r, i) { if (!first && !normSp(r.site)) first = i + 1; });
+  gridFocus((first || 1) - 1, 1);
+}
+function closeGrid() { document.getElementById('gridModal').classList.remove('on'); }
+function gridFocus(r, c) {
+  var el = gridTb.querySelector('[data-r="' + r + '"][data-c="' + c + '"]');
+  if (el) { el.focus(); if (el.select) try { el.select(); } catch (e) {} }
+}
+function renderGrid() {
+  var h = '<thead><tr><th></th>' + GCOLS.map(function (c) { return '<th>' + esc(c.t) + '</th>'; }).join('') + '<th></th></tr></thead><tbody>';
+  gridRows.forEach(function (row, r) {
+    h += '<tr data-r="' + r + '"><td class="gn">' + (r + 1) + '</td>';
+    GCOLS.forEach(function (c, ci) {
+      var v = row[c.k], at = ' data-r="' + r + '" data-c="' + ci + '"';
+      if (c.sel) h += '<td class="gc" data-k="' + c.k + '"><select' + at + '><option value="">—</option>' + c.sel.map(function (o) { return '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select></td>';
+      else h += '<td class="gc" data-k="' + c.k + '"><input' + at + ' autocomplete="off" value="' + esc(v) + '"' + (c.list ? ' list="' + c.list + '"' : '') + (c.ph ? ' placeholder="' + esc(c.ph) + '"' : '') + '></td>';
+    });
+    h += '<td><button type="button" class="gx" title="ลบแถวนี้" onclick="gridDelRow(' + r + ')">✕</button></td></tr>';
+  });
+  gridTb.innerHTML = h + '</tbody>';
+  gridValidate();
+}
+function gridAddRows(n) {
+  for (var i = 0; i < n && gridRows.length < GRID_MAX_ROWS; i++) gridRows.push(gridDefaults(gridRows[gridRows.length - 1] || null));
+  renderGrid(); gridFocus(gridRows.length - n, 1);
+}
+function gridDelRow(i) {
+  gridRows.splice(i, 1);
+  if (!gridRows.length) gridRows.push(gridDefaults(null));
+  renderGrid();
+}
+function gridClear() {
+  var any = gridRows.some(function (r) { return normSp(r.site) || normSp(r.note); });
+  if (any && !confirm('ล้างข้อมูลในตารางทั้งหมด?')) return;
+  gridRows = []; openGrid();
+}
+function gridPaste(r0, c0, text) {
+  var rows = parseTSV(text).filter(function (row) { return row.some(function (x) { return String(x).trim() !== ''; }); }).slice(0, GRID_MAX_ROWS);
+  if (!rows.length) return;
+  var map = headerMap(rows[0]), body = map ? rows.slice(1) : rows, lastR = r0, lastC = c0;
+  body.forEach(function (cells, i) {
+    var r = r0 + i; if (r >= GRID_MAX_ROWS) return;
+    while (gridRows.length <= r) gridRows.push(gridDefaults(gridRows[gridRows.length - 1] || null));
+    cells.forEach(function (v, j) {
+      var k = map ? map[j] : (GCOLS[c0 + j] ? GCOLS[c0 + j].k : null);
+      if (!k) return;
+      gridRows[r][k] = gnorm(k, v); lastR = r; lastC = map ? 0 : c0 + j;
+    });
+  });
+  renderGrid(); gridFocus(lastR, map ? 1 : Math.min(lastC, GCOLS.length - 1));
+}
+function gridEnter(r, c) {
+  if (r >= gridRows.length - 1 && gridRows.length < GRID_MAX_ROWS) gridRows.push(gridDefaults(gridRows[r]));
+  renderGrid(); gridFocus(Math.min(r + 1, gridRows.length - 1), c);
+}
+function gridNormalizeAll() { gridRows.forEach(function (row) { ['date', 'tin', 'tout', 'num'].forEach(function (k) { row[k] = gnorm(k, row[k]); }); }); }
+
+/* ตรวจทุกแถวที่ "ใส่ Site แล้ว" -> คืน {ok: แถวที่พร้อมบันทึก, errs: ข้อความ, dups: จำนวนที่ซ้ำ} พร้อมระบายสีช่องที่ผิด/แถวที่ซ้ำ */
+function gridValidate() {
+  var exist = Object.create(null), seen = Object.create(null), ok = [], errs = [], dups = 0;
+  var skip = document.getElementById('gridSkipDup').checked;
+  data.forEach(function (e) { exist[String(e.site).toLowerCase() + '|' + e.date] = 1; });
+  gridRows.forEach(function (row, i) {
+    var active = normSp(row.site) !== '', bad = {}, iso = parseDateFlexible(row.date);
+    if (active) {
+      if (!iso) bad.date = 'วันที่ไม่ถูกต้อง';
+      if (!normSp(row.proj)) bad.proj = 'ยังไม่ใส่ Project';
+      if (!normSp(row.lead)) bad.lead = 'ยังไม่ใส่หัวหน้าทีม';
+      if (normSp(row.tin) && !normTimeJS(row.tin)) bad.tin = 'เวลาเข้าไม่ถูกต้อง';
+      if (normSp(row.tout) && !normTimeJS(row.tout)) bad.tout = 'เวลาออกไม่ถูกต้อง';
+      if (normSp(row.num) && !/^[1-9]\d*$/.test(thDigits(row.num).trim())) bad.num = 'จำนวนทีมต้องเป็นตัวเลข ≥ 1';
+      if (TYPES.indexOf(row.type) < 0) bad.type = 'เลือกประเภทงาน';
+      if (STATUSES.indexOf(row.status) < 0) bad.status = 'เลือกสถานะ';
+    }
+    var key = active && iso ? normSp(row.site).toLowerCase() + '|' + iso : null;
+    var dup = !!(key && (exist[key] || seen[key])); if (key) seen[key] = 1;
+    var nbad = Object.keys(bad).length;
+    if (active && nbad) errs.push('แถว ' + (i + 1) + ': ' + bad[Object.keys(bad)[0]]);
+    if (active && !nbad) { if (dup) { dups++; if (skip) return gridMark(i, bad, dup); } ok.push({ i: i, row: row, iso: iso }); }
+    gridMark(i, bad, dup && active);
+  });
+  var el = document.getElementById('gridInfo'), cls = 'bulk-info', txt = 'พร้อมบันทึก ' + ok.length + ' รายการ';
+  if (dups) { txt += (skip ? ' · ข้าม ' : ' · มี ') + dups + ' แถวที่ site+วันที่ซ้ำ'; cls += ' warn'; }
+  if (errs.length) { txt += ' · ผิด ' + errs.length + ' แถว (' + errs[0] + ')'; cls = 'bulk-info err'; }
+  if (ok.length > MAX_BATCH) { txt += ' · เกินขีดจำกัด ' + MAX_BATCH + ' รายการต่อครั้ง'; cls = 'bulk-info err'; }
+  el.className = cls; el.textContent = txt; el.style.display = 'block';
+  document.getElementById('gridSave').disabled = !(ok.length && !errs.length && ok.length <= MAX_BATCH);
+  return { ok: ok, errs: errs, dups: dups };
+}
+function gridMark(i, bad, dup) {
+  var tr = gridTb.querySelector('tr[data-r="' + i + '"]'); if (!tr) return;
+  tr.classList.toggle('gc-dup', !!dup);
+  [].forEach.call(tr.querySelectorAll('td.gc'), function (td) {
+    var k = td.getAttribute('data-k'), b = bad[k];
+    td.classList.toggle('gc-bad', !!b); if (b) td.title = b; else td.removeAttribute('title');
+  });
+}
+function gridSubmit() {
+  if (busy) return;
+  gridNormalizeAll();
+  var v = gridValidate();
+  if (v.errs.length) { alert('ยังมีข้อมูลที่ไม่ถูกต้อง:\n' + v.errs.slice(0, 6).join('\n') + (v.errs.length > 6 ? '\n… อีก ' + (v.errs.length - 6) + ' แถว' : '')); return; }
+  if (!v.ok.length) { alert('ยังไม่มีรายการที่พร้อมบันทึก (ใส่ Site อย่างน้อย 1 แถว)'); return; }
+  if (v.ok.length > MAX_BATCH) { alert('บันทึกได้ครั้งละไม่เกิน ' + MAX_BATCH + ' รายการ (ตอนนี้ ' + v.ok.length + ')'); return; }
+  var cm = { proj: buildCanon('proj'), lead: buildCanon('lead'), site: buildCanon('site') };
+  var ids = makeIds(v.ok.length), base = Date.now();
+  var stamp = ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+  var rows = v.ok.map(function (x, n) {
+    var r = x.row;
+    return { id: ids[n], date: x.iso, tin: normTimeJS(r.tin), tout: normTimeJS(r.tout), proj: canon(cm.proj, r.proj), site: canon(cm.site, r.site), lead: canon(cm.lead, r.lead),
+      num: normSp(r.num) ? String(parseInt(thDigits(r.num), 10)) : '1', type: r.type, status: r.status, note: normSp(r.note), updatedBy: stamp, ts: base + n };
+  });
+  saveMem(rows[rows.length - 1]);
+  var count = rows.length;
+  push(count === 1 ? 'save' : 'saveMany', count === 1 ? { row: rows[0] } : { rows: rows }, { onOk: function () {
+    gridRows = []; closeGrid();
+    showToast('บันทึกจากตาราง ' + count + ' รายการแล้ว', 'ตกลง', null, 5000);
+  } });
+}
+
+/* ============ พิมพ์ด่วน: อ่านประโยคบรรทัดเดียวแล้วแยกเป็น วันที่ / site / หัวหน้า / เวลา / ประเภท ... ============
+   parseQuick เป็นฟังก์ชันล้วน (รับ "วันนี้" และรายชื่อที่รู้จักจาก ctx) ทดสอบด้วยวันที่คงที่ได้
+   ลำดับ: เวลา → จำนวนทีม → สถานะ → ประเภท → วันที่ → site → หัวหน้า → โปรเจกต์ → ที่เหลือเก็บเป็นหมายเหตุ (ไม่ทิ้งเงียบๆ) */
+var MONTH_LIST = [['ม.ค.', 'มกราคม'], ['ก.พ.', 'กุมภาพันธ์'], ['มี.ค.', 'มีนาคม'], ['เม.ย.', 'เมษายน'], ['พ.ค.', 'พฤษภาคม'], ['มิ.ย.', 'มิถุนายน'],
+  ['ก.ค.', 'กรกฎาคม'], ['ส.ค.', 'สิงหาคม'], ['ก.ย.', 'กันยายน'], ['ต.ค.', 'ตุลาคม'], ['พ.ย.', 'พฤศจิกายน'], ['ธ.ค.', 'ธันวาคม']];
+function escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+var MONTH_RE = MONTH_LIST.map(function (m) { return m[1] + '|' + escapeRe(m[0]); }).join('|');
+function monthIndex(str) { for (var i = 0; i < 12; i++) if (str === MONTH_LIST[i][0] || str === MONTH_LIST[i][1]) return i + 1; return 0; }
+var WD_NAMES = [['จันทร์'], ['อังคาร'], ['พุธ'], ['พฤหัสบดี', 'พฤหัส'], ['ศุกร์'], ['เสาร์'], ['อาทิตย์']];
+var D_ISO = '\\d{4}-\\d{1,2}-\\d{1,2}';
+var D_SLASH = '\\d{1,2}/\\d{1,2}(?:/\\d{2,4})?';
+var D_MON = '\\d{1,2}\\s*(?:เดือน\\s*)?(?:' + MONTH_RE + ')(?:\\s*\\d{4})?';
+var D_RANGE_DAYS = '\\d{1,2}\\s*-\\s*\\d{1,2}\\s*(?:เดือน\\s*)?(?:' + MONTH_RE + ')(?:\\s*\\d{4})?';
+var D_REL = 'วันนี้|พรุ่งนี้|มะรืนนี้|มะรืน|เมื่อวานนี้|เมื่อวาน';
+var D_WD = '(?:วัน)?(?:จันทร์|อังคาร|พุธ|พฤหัสบดี|พฤหัส|ศุกร์|เสาร์|อาทิตย์)(?:\\s*(?:หน้า|นี้))?';
+var D_ONE = '(?:' + [D_ISO, D_SLASH, D_MON, D_REL, D_WD].join('|') + ')';
+var QUICK_STOP = ['ไป', 'เข้า', 'งาน', 'ที่', 'ของ', 'ทีม', 'วัน', 'ไซต์', 'ไซท์', 'site', 'โดย', 'พร้อม', 'และ', 'ใน', 'เวลา', 'น.', 'น', 'ครับ', 'ค่ะ', 'คะ', 'นะ', 'ด้วย', 'หน่อย', 'เพิ่ม', 'สร้าง', 'ลง', 'ให้', 'โปรเจกต์', 'โปรเจค', 'โครงการ', 'project', 'หัวหน้า', 'หัวหน้าทีม', 'คน'];
+
+function bumpYear(iso, t0) {   // ไม่ระบุปี และเป็นอดีตเกิน 31 วัน -> ตีความว่าปีหน้า
+  if (diffDays(t0, iso) <= 31) return iso;
+  var p = iso.split('-'), ny = +p[0] + 1;
+  return isRealYmd(ny, +p[1], +p[2]) ? ny + '-' + p[1] + '-' + p[2] : iso;
+}
+function parseOneDate(tok, today) {
+  var s = String(tok).trim(), t0 = ymdOf(today), m;
+  if (/^\d{4}-/.test(s)) return parseDateFlexible(s);
+  if (s.indexOf('/') > -1) {
+    var r = parseDateFlexible(s, today.getFullYear()); if (!r) return '';
+    return s.split('/').length === 3 ? r : bumpYear(r, t0);
+  }
+  if ((m = s.match(new RegExp('^(\\d{1,2})\\s*(?:เดือน\\s*)?(' + MONTH_RE + ')(?:\\s*(\\d{4}))?$')))) {
+    var mo = monthIndex(m[2]), y = m[3] ? fullYear(+m[3], 4) : today.getFullYear();
+    if (!mo || !isRealYmd(y, mo, +m[1])) return '';
+    var iso = y + '-' + pad2(mo) + '-' + pad2(+m[1]);
+    return m[3] ? iso : bumpYear(iso, t0);
+  }
+  if (/^วันนี้$/.test(s)) return t0;
+  if (/^พรุ่งนี้$/.test(s)) return addDays(t0, 1);
+  if (/^มะรืน(นี้)?$/.test(s)) return addDays(t0, 2);
+  if (/^เมื่อวาน(นี้)?$/.test(s)) return addDays(t0, -1);
+  var base = s.replace(/^วัน/, '').replace(/\s*(หน้า|นี้)$/, ''), mod = /หน้า$/.test(s) ? 'next' : /นี้$/.test(s) ? 'this' : 'up', wd = -1;
+  WD_NAMES.forEach(function (names, i) { if (names.indexOf(base) > -1) wd = i; });
+  if (wd < 0) return '';
+  var todayIdx = (today.getDay() + 6) % 7;
+  if (mod === 'this') return addDays(mondayOf(t0), wd);
+  if (mod === 'next') return addDays(mondayOf(t0), 7 + wd);
+  var delta = (wd - todayIdx + 7) % 7; if (delta === 0) delta = 7;
+  return addDays(t0, delta);
+}
+
+function parseQuick(text, ctx) {
+  ctx = ctx || {};
+  var today = ctx.today || new Date(), t0 = ymdOf(today), mem = ctx.mem || {};
+  var rest = ' ' + thDigits(text).replace(/\s+/g, ' ').trim() + ' ';
+  var out = { dates: [], sites: [], lead: '', proj: '', tin: '', tout: '', num: '', type: '', status: '', note: '', defaults: {}, unresolved: [], warns: [] };
+  function take(src) {          // ตัดคำ/วลีที่ตรงรูปแบบ (ต้องคั่นด้วยช่องว่าง , ; ) ออกจากประโยคแล้วคืนข้อความที่ตัด — ไม่ใช้ lookbehind เพื่อให้เบราว์เซอร์/iOS รุ่นเก่าอ่านไฟล์ได้
+    var m = new RegExp('(^|[\\s,;])(' + src + ')(?=[\\s,;]|$)', 'i').exec(rest);
+    if (!m) return null;
+    rest = rest.slice(0, m.index) + m[1] + rest.slice(m.index + m[0].length);
+    return m[2];
+  }
+  function namePat(name) { return String(name).trim().split(/\s+/).map(escapeRe).join('\\s+'); }
+  function takeKnown(list) {
+    var sorted = list.slice().sort(function (a, b) { return b.length - a.length; }), hit = '';
+    sorted.some(function (n) { if (n && take(namePat(n))) { hit = n; return true; } return false; });
+    return hit;
+  }
+  function takePartial(list) {  // พิมพ์แค่บางส่วนของชื่อ (เช่น "ประสิทธิ์") ใช้ได้เมื่อตรงกับชื่อที่รู้จักเพียงชื่อเดียวเท่านั้น
+    var toks = rest.trim().split(/\s+/);
+    for (var i = 0; i < toks.length; i++) {
+      var t = toks[i].replace(/[,;]+$/, ''), tl = t.toLowerCase();
+      if (t.length < 3 || /^\d+$/.test(t) || QUICK_STOP.indexOf(tl) > -1) continue;
+      var hits = list.filter(function (L) { return L.toLowerCase().indexOf(tl) > -1; });
+      if (hits.length !== 1) continue;
+      var j = i + 1, L = hits[0].toLowerCase();
+      while (j < toks.length && toks[j].replace(/[,;]+$/, '').length >= 2 && L.indexOf(toks[j].replace(/[,;]+$/, '').toLowerCase()) > -1) j++;
+      toks.splice(i, j - i);
+      rest = ' ' + toks.join(' ') + ' ';
+      return hits[0];
+    }
+    return '';
+  }
+  var m, tm;
+
+  /* 1) ช่วงเวลา */
+  var TS = '(?:\\s*น\\.?)?';
+  var T_A = '\\d{1,2}[:.]\\d{2}\\s*(?:-|–|ถึง|to)\\s*\\d{1,2}[:.]\\d{2}' + TS, T_B = '\\d{4}\\s*-\\s*\\d{4}' + TS, T_C = '\\d{1,2}(?:[:.]\\d{2})?\\s*(?:-|–|ถึง)\\s*\\d{1,2}(?:[:.]\\d{2})?\\s*น\\.?';
+  while ((tm = take(T_A) || take(T_B) || take(T_C))) {
+    var nn = tm.replace(/น\.?\s*$/, '').match(/\d+/g) || [], a, b;
+    if (nn.length === 4) { a = normTimeJS(nn[0] + ':' + nn[1]); b = normTimeJS(nn[2] + ':' + nn[3]); }
+    else { a = normTimeJS(nn[0]); b = normTimeJS(nn[1]); }
+    if (!a || !b) out.warns.push('เวลาไม่ถูกต้อง: ' + tm.trim());
+    else if (!out.tin) { out.tin = a; out.tout = b; }
+    else out.warns.push('มีช่วงเวลามากกว่าหนึ่งช่วง ใช้ช่วงแรก');
+  }
+  /* 2) จำนวนทีม  3) สถานะ  4) ประเภทงาน */
+  while ((tm = take('\\d+\\s*คน') || take('ทีม\\s*\\d+'))) {
+    var n = parseInt(tm.match(/\d+/)[0], 10);
+    if (n >= 1 && n <= 99) out.num = String(n); else out.warns.push('จำนวนทีมไม่สมเหตุสมผล: ' + tm.trim());
+  }
+  while ((tm = take('เสร็จสิ้น|เสร็จ|กำลังดำเนินการ|ดำเนินการ|วางแผน|เลื่อน'))) out.status = out.status || fuzzyStatus(tm);
+  while ((tm = take('ติดตั้ง|ตรวจสอบ|ตรวจ|ซ่อมบำรุง|ซ่อม|บำรุง|สำรวจ|อื่นๆ|install|inspect|survey|maintenance'))) out.type = out.type || fuzzyType(tm);
+
+  /* 5) วันที่ (ช่วงวัน "15-17 พ.ย." / "A ถึง B" / วันเดี่ยวหลายวัน) */
+  var dset = Object.create(null);
+  function addDate(iso, tok) { if (iso) dset[iso] = 1; else out.warns.push('วันที่ไม่ถูกต้อง: ' + String(tok).trim()); }
+  function addRange(a, b, tok) {
+    if (!a || !b || a > b || diffDays(b, a) > 366) { out.warns.push('ช่วงวันที่ไม่ถูกต้อง: ' + String(tok).trim()); return; }
+    for (var d = a; d <= b; d = addDays(d, 1)) dset[d] = 1;
+  }
+  while ((tm = take(D_RANGE_DAYS))) {
+    m = tm.match(new RegExp('^(\\d{1,2})\\s*-\\s*(\\d{1,2})\\s*(?:เดือน\\s*)?(' + MONTH_RE + ')(?:\\s*(\\d{4}))?$'));
+    var a1 = m && parseOneDate(m[1] + ' ' + m[3] + (m[4] ? ' ' + m[4] : ''), today), b1 = m && parseOneDate(m[2] + ' ' + m[3] + (m[4] ? ' ' + m[4] : ''), today);
+    addRange(a1, b1, tm);
+  }
+  while ((tm = take(D_ONE + '\\s*ถึง\\s*' + D_ONE))) { var pr = tm.split('ถึง'); addRange(parseOneDate(pr[0], today), parseOneDate(pr[1], today), tm); }
+  while ((tm = take(D_ONE))) addDate(parseOneDate(tm, today), tm);
+
+  /* 6) site: ช่วง (BKCC523-528) → รายการคั่น , (BKCC523,525) → ชื่อที่รู้จัก (มีเว้นวรรคได้) → รหัสเดี่ยว */
+  function addSite(v) { var k = v.toLowerCase(); if (!out.sites.some(function (x) { return x.toLowerCase() === k; })) out.sites.push(v); }
+  while ((tm = take('[A-Za-z]{2,}\\d+\\s*(?:-|–|ถึง|to)\\s*(?:[A-Za-z]{2,})?\\d+'))) {
+    m = tm.match(/^([A-Za-z]{2,})(\d+)\s*(?:-|–|ถึง|to)\s*([A-Za-z]{2,})?(\d+)$/i);
+    if (!m || (m[3] && m[3].toLowerCase() !== m[1].toLowerCase()) || +m[4] < +m[2]) { out.warns.push('ช่วง site ไม่ถูกต้อง: ' + tm.trim()); continue; }
+    if (+m[4] - +m[2] + 1 > 1000) { out.warns.push('ช่วง site ใหญ่เกินไป (เกิน 1000): ' + tm.trim()); continue; }
+    for (var k = +m[2]; k <= +m[4]; k++) addSite(m[1] + pad(k, m[2].length > 1 ? m[2].length : 0));
+  }
+  while ((tm = take('[A-Za-z]{2,}\\d+(?:\\s*,\\s*\\d+)+'))) {
+    var parts = tm.split(/\s*,\s*/), pre = parts[0].match(/^([A-Za-z]{2,})/)[1];
+    addSite(parts[0]); parts.slice(1).forEach(function (x) { addSite(pre + x); });
+  }
+  var knownSite;
+  while ((knownSite = takeKnown(ctx.sites || []))) addSite(knownSite);
+  while ((tm = take('[A-Za-z]{2,}\\d+'))) addSite(tm);
+
+  /* 7) หัวหน้าทีม 8) โปรเจกต์ */
+  out.lead = takeKnown(ctx.leads || []) || takePartial(ctx.leads || []);
+  out.proj = takeKnown(ctx.projs || []) || takePartial(ctx.projs || []);
+
+  /* 9) ที่เหลือ: ไม่ทิ้ง — เก็บเป็นหมายเหตุ */
+  rest.split(/[\s,;]+/).forEach(function (t) { if (t && QUICK_STOP.indexOf(t.toLowerCase()) < 0) out.unresolved.push(t); });
+  out.note = out.unresolved.join(' ');
+
+  out.dates = Object.keys(dset).sort();
+  if (!out.dates.length) { out.dates = [t0]; out.defaults.date = true; }
+  ['lead', 'proj'].forEach(function (k) { if (!out[k] && mem[k]) { out[k] = mem[k]; out.defaults[k] = true; } });
+  if (!out.tin) { out.tin = mem.tin || '08:30'; out.tout = mem.tout || '17:00'; out.defaults.time = true; }
+  if (!out.type) { out.type = mem.type || 'ติดตั้ง'; out.defaults.type = true; }
+  if (!out.num) { out.num = String(mem.num || 1); out.defaults.num = true; }
+  if (!out.status) { out.status = 'วางแผน'; out.defaults.status = true; }
+  return out;
+}
+
+/* ---- หน้าจอพิมพ์ด่วน ---- */
+function fmtDate(iso) { var d = dateOf(iso); return DOW[(d.getDay() + 6) % 7] + '. ' + d.getDate() + ' ' + MONTH_LIST[d.getMonth()][0]; }
+function quickCtx() {
+  var u = function (k) { var seen = Object.create(null), o = []; data.forEach(function (e) { var v = normSp(e[k]); if (v && !seen[v.toLowerCase()]) { seen[v.toLowerCase()] = 1; o.push(v); } }); return o; };
+  return { today: new Date(), sites: u('site'), leads: u('lead'), projs: u('proj'), mem: loadMem() };
+}
+function quickPlan() {
+  var p = parseQuick(qa_text.value, quickCtx());
+  var cmS = buildCanon('site'), cmL = buildCanon('lead'), cmP = buildCanon('proj'), seen = Object.create(null), sites = [];
+  p.sites.forEach(function (x) { var v = canon(cmS, x), k = v.toLowerCase(); if (v && !seen[k]) { seen[k] = 1; sites.push(v); } });
+  var common = { lead: canon(cmL, p.lead), proj: canon(cmP, p.proj), tin: p.tin, tout: p.tout, num: p.num, type: p.type, status: p.status, note: p.note };
+  var multi = sites.length * p.dates.length > 1, exist = Object.create(null), combos = [], skipped = 0, problems = [];
+  data.forEach(function (e) { exist[String(e.site).toLowerCase() + '|' + e.date] = 1; });
+  sites.forEach(function (st) { p.dates.forEach(function (dt) {
+    if (multi && exist[st.toLowerCase() + '|' + dt]) { skipped++; return; }
+    combos.push({ site: st, date: dt });
+  }); });
+  if (!sites.length) problems.push('ยังไม่มี Site — พิมพ์รหัส เช่น BKCC523 หรือ BKCC523-528');
+  if (!common.lead) problems.push('ยังไม่มีหัวหน้าทีม — พิมพ์ชื่อ (หรือบางส่วนของชื่อที่เคยใช้) หรือสร้างจากฟอร์มสักครั้งให้ระบบจำ');
+  if (!common.proj) problems.push('ยังไม่มี Project — พิมพ์ชื่อ Project หรือสร้างจากฟอร์มสักครั้งให้ระบบจำ');
+  if (sites.length && !combos.length) problems.push('ไม่มีรายการใหม่ — ทุกคู่ site+วันที่ มีอยู่แล้ว');
+  if (combos.length > MAX_BATCH) problems.push('เกินขีดจำกัด ' + MAX_BATCH + ' รายการต่อครั้ง (ตอนนี้ ' + combos.length + ')');
+  return { p: p, sites: sites, common: common, combos: combos, skipped: skipped, problems: problems };
+}
+function quickUpdate() {
+  var q = quickPlan(), p = q.p, df = p.defaults, chips = [];
+  var chip = function (txt, cls) { chips.push('<span class="chip static' + (cls ? ' ' + cls : '') + '">' + esc(txt) + '</span>'); };
+  if (!qa_text.value.trim()) { qa_chips.innerHTML = ''; qa_info.className = 'bulk-info'; qa_info.textContent = 'พิมพ์ได้เลย เช่น BKCC523-528 นายประสิทธิ์ พรุ่งนี้ ติดตั้ง'; qa_info.style.display = 'block'; qa_go.disabled = true; qa_form.disabled = true; return; }
+  var dd = p.dates.length <= 3 ? p.dates.map(fmtDate).join(', ') : p.dates.length + ' วัน (' + fmtDate(p.dates[0]) + ' – ' + fmtDate(p.dates[p.dates.length - 1]) + ')';
+  chip('📅 ' + dd, df.date ? 'dim' : '');
+  chip('🏷 ' + (q.sites.length ? (q.sites.length <= 4 ? q.sites.join(', ') : q.sites.length + ' site (' + q.sites[0] + ' … ' + q.sites[q.sites.length - 1] + ')') : 'ไม่พบ Site'), q.sites.length ? '' : 'bad');
+  chip('👤 ' + (q.common.lead || 'ไม่มีหัวหน้าทีม'), !q.common.lead ? 'bad' : df.lead ? 'dim' : '');
+  chip('📁 ' + (q.common.proj || 'ไม่มี Project'), !q.common.proj ? 'bad' : df.proj ? 'dim' : '');
+  chip('⏰ ' + p.tin + '–' + p.tout, df.time ? 'dim' : '');
+  chip('🔧 ' + p.type, df.type ? 'dim' : '');
+  chip('👥 ' + p.num + ' คน', df.num ? 'dim' : '');
+  if (!df.status) chip('📌 ' + p.status, '');
+  if (p.note) chip('📝 หมายเหตุ: ' + p.note, 'bad');
+  p.warns.forEach(function (w) { chip('⚠ ' + w, 'bad'); });
+  qa_chips.innerHTML = chips.join('');
+  var ok = !q.problems.length;
+  qa_info.className = 'bulk-info' + (ok ? (q.skipped ? ' warn' : '') : ' err');
+  qa_info.textContent = ok ? 'จะสร้าง ' + q.combos.length + ' รายการ (' + q.sites.length + ' site × ' + p.dates.length + ' วัน)' + (q.skipped ? ' · ข้าม ' + q.skipped + ' รายการที่ซ้ำกับของเดิม' : '') + (p.note ? ' · ข้อความที่ไม่เข้าใจจะเก็บไว้ในหมายเหตุ' : '') : q.problems.join(' · ');
+  qa_info.style.display = 'block';
+  qa_go.disabled = !ok; qa_form.disabled = !q.sites.length;
+}
+function openQuick() {
+  document.getElementById('quickModal').classList.add('on');
+  qa_text.value = '';
+  qa_mic.style.display = (window.SpeechRecognition || window.webkitSpeechRecognition) ? '' : 'none';
+  quickUpdate(); qa_text.focus();
+}
+function closeQuick() { document.getElementById('quickModal').classList.remove('on'); }
+function quickKey(e) { if (e.key === 'Enter' && !qa_go.disabled) { e.preventDefault(); quickCreate(); } }
+function quickCreate() {
+  if (busy) return;
+  var q = quickPlan();
+  if (q.problems.length) { alert(q.problems.join('\n')); return; }
+  var n = q.combos.length, c = q.common;
+  if (n >= 10 && !confirm('จะสร้าง ' + n + ' รายการ (' + q.sites.length + ' site × ' + q.p.dates.length + ' วัน)' + (q.skipped ? ' และข้าม ' + q.skipped + ' รายการที่ซ้ำ' : '') + '\nยืนยันไหม?')) return;
+  var ids = makeIds(n), base = Date.now();
+  var stamp = ME + ' • ' + new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+  var rows = q.combos.map(function (x, i) {
+    return { id: ids[i], date: x.date, tin: c.tin, tout: c.tout, proj: c.proj, site: x.site, lead: c.lead, num: c.num, type: c.type, status: c.status, note: c.note, updatedBy: stamp, ts: base + i };
+  });
+  saveMem(c);
+  push(n === 1 ? 'save' : 'saveMany', n === 1 ? { row: rows[0] } : { rows: rows }, { onOk: function () {
+    closeQuick();
+    showToast('สร้าง ' + n + ' รายการแล้ว', 'ตกลง', null, 5000);
+  } });
+}
+function quickToForm() {   // ส่งสิ่งที่อ่านได้ไปกรอกต่อในฟอร์มปกติ (ตรวจ/แก้ได้ก่อนบันทึก)
+  var q = quickPlan(), p = q.p, c = q.common;
+  if (!q.sites.length) return;
+  closeQuick(); openForm(p.dates[0]);
+  f_proj.value = c.proj; f_lead.value = c.lead; f_in.value = p.tin; f_out.value = p.tout; f_num.value = p.num; f_type.value = p.type; f_status.value = p.status; f_note.value = p.note;
+  ['f_proj', 'f_lead', 'f_in', 'f_out', 'f_num', 'f_type'].forEach(function (id) { formTouched[id] = 1; });
+  if (q.sites.length > 1) { f_bulk.checked = true; f_sites.value = q.sites.join('\n'); toggleBulk(); } else f_site.value = q.sites[0];
+  var consecutive = p.dates.length > 1 && p.dates.every(function (d, i) { return i === 0 || diffDays(d, p.dates[i - 1]) === 1; });
+  if (consecutive) { f_repeat.checked = true; f_repeat_freq.value = 'daily'; f_repeat_until.value = p.dates[p.dates.length - 1]; toggleRepeat(); }
+  else if (p.dates.length > 1) { memHint.style.display = 'block'; memHint.textContent = 'พิมพ์หลายวันที่ไม่ติดกัน — ใส่เฉพาะวันแรกในฟอร์ม (ใช้ "พิมพ์ด่วน" สร้างทุกวันได้เลย)'; }
+  updateBulkInfo();
+  syncChips();
+}
+function quickVoice() {     // พิมพ์ด้วยเสียง (ขึ้นกับเบราว์เซอร์/อุปกรณ์; ไม่รองรับก็จะไม่โชว์ปุ่ม)
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) return;
+  var rec = new SR(), btn = document.getElementById('qa_mic');
+  rec.lang = 'th-TH'; rec.interimResults = false; rec.maxAlternatives = 1;
+  rec.onresult = function (e) {
+    var t = e && e.results && e.results[0] && e.results[0][0] ? e.results[0][0].transcript : '';
+    if (t) { qa_text.value = (qa_text.value ? qa_text.value + ' ' : '') + t; quickUpdate(); }
+  };
+  rec.onerror = function (e) { alert('ใช้เสียงไม่ได้: ' + ((e && e.error) || 'ไม่ทราบสาเหตุ')); };
+  rec.onend = function () { btn.textContent = '🎤'; };
+  btn.textContent = '⏺';
+  try { rec.start(); } catch (err) { btn.textContent = '🎤'; }
+}
+
+/* ============ ชิปแตะเลือก (เวลา / สถานะ / ประเภท) — ใช้นิ้วแตะเร็วกว่าเปิด dropdown บนมือถือ ============ */
+var TIME_PRESETS = [['08:30', '17:00', ''], ['09:00', '18:00', ''], ['08:30', '12:00', 'เช้า'], ['13:00', '17:00', 'บ่าย']];
+function renderFormChips() {
+  chipTime.innerHTML = TIME_PRESETS.map(function (t, i) { return '<button type="button" class="chip" onclick="setTimes(' + i + ')">' + (t[2] ? t[2] + ' ' : '') + t[0] + '–' + t[1] + '</button>'; }).join('');
+  chipStatus.innerHTML = STATUSES.map(function (v, i) { return '<button type="button" class="chip" onclick="setStatus(' + i + ')">' + esc(v) + '</button>'; }).join('');
+  chipType.innerHTML = TYPES.map(function (v, i) { return '<button type="button" class="chip" onclick="setType(' + i + ')">' + esc(v) + '</button>'; }).join('');
+}
+function syncChips() {
+  var on = function (box, test) { [].forEach.call(box.querySelectorAll('.chip'), function (b, i) { b.classList.toggle('on', !!test(i)); }); };
+  on(chipTime, function (i) { return f_in.value === TIME_PRESETS[i][0] && f_out.value === TIME_PRESETS[i][1]; });
+  on(chipStatus, function (i) { return f_status.value === STATUSES[i]; });
+  on(chipType, function (i) { return f_type.value === TYPES[i]; });
+}
+function setTimes(i) { f_in.value = TIME_PRESETS[i][0]; f_out.value = TIME_PRESETS[i][1]; formTouched.f_in = 1; formTouched.f_out = 1; syncChips(); }
+function setStatus(i) { f_status.value = STATUSES[i]; syncChips(); }
+function setType(i) { f_type.value = TYPES[i]; formTouched.f_type = 1; syncChips(); }
+
+/* ============ ลิงก์/QR ของ site: ?site=BKCC523 (&date=ปปปป-ดด-วว) เปิดฟอร์มเพิ่มรายการที่เติมชื่อ site ให้ ============ */
+var pendingLink = null;
+function readDeepLink() {
+  try {
+    var q = new URLSearchParams(location.search), site = normSp(q.get('site') || '');
+    if (!site) return null;
+    return { site: site, date: parseDateFlexible(q.get('date') || '') || todayLocal() };
+  } catch (e) { return null; }
+}
+function openDeepLink(l) {
+  openForm(l.date);
+  f_site.value = canon(buildCanon('site'), l.site);
+  autofillFromSite();
+  memHint.style.display = 'block';
+  memHint.textContent = 'เปิดจากลิงก์/QR ของ site ' + f_site.value + ' — ตรวจข้อมูลแล้วกดบันทึก';
+  syncChips();
+}
+
+/* ============ QR ของ Site (ไลบรารี qrcode-generator ฝังอยู่ในไฟล์ ไม่ต้องใช้อินเทอร์เน็ตตอนสร้าง) ============ */
+var QR_MAX = 120;
+function qrMatrix(text) {
+  var qr = qrcode(0, 'M'); qr.addData(String(text)); qr.make();
+  var n = qr.getModuleCount(), m = [];
+  for (var r = 0; r < n; r++) { var row = []; for (var c = 0; c < n; c++) row.push(!!qr.isDark(r, c)); m.push(row); }
+  return m;
+}
+function qrSvg(text) {
+  var m = qrMatrix(text), n = m.length, Q = 4, d = '';
+  m.forEach(function (row, r) {
+    for (var c = 0; c < n; c++) {
+      if (!row[c]) continue;
+      var e = c; while (e < n && row[e]) e++;                       // รวมช่องดำที่ติดกันเป็นแถบเดียว ลดขนาดไฟล์
+      d += 'M' + (c + Q) + ',' + (r + Q) + 'h' + (e - c) + 'v1h-' + (e - c) + 'z'; c = e;
+    }
+  });
+  var N = n + 2 * Q;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + N + ' ' + N + '" shape-rendering="crispEdges" role="img" aria-label="QR"><rect width="' + N + '" height="' + N + '" fill="#fff"/><path d="' + d + '" fill="#000"/></svg>';
+}
+function siteLink(site) { return location.origin + location.pathname + '?site=' + encodeURIComponent(site); }
+function openQr() { document.getElementById('qrModal').classList.add('on'); renderQr(); }
+function closeQr() { document.getElementById('qrModal').classList.remove('on'); }
+function qrNames() {
+  var cm = buildCanon('site'), seen = Object.create(null), out = [];
+  String(qr_sites.value || '').split(/[\n\r,;\t]+/).forEach(function (x) { var v = canon(cm, x), k = v.toLowerCase(); if (v && !seen[k]) { seen[k] = 1; out.push(v); } });
+  return out;
+}
+function renderQr() {
+  var names = qrNames(), over = names.length > QR_MAX;
+  if (over) names = names.slice(0, QR_MAX);
+  qr_out.innerHTML = names.length ? names.map(function (s) {
+    return '<div class="qr-card">' + qrSvg(siteLink(s)) + '<div class="qr-name">' + esc(s) + '</div><div class="qr-sub">สแกนเพื่อเพิ่มรายการ</div></div>';
+  }).join('') : '<div class="hint" style="padding:8px 0">ใส่ชื่อ Site เพื่อสร้าง QR</div>';
+  qr_info.textContent = names.length + ' ป้าย' + (over ? ' (แสดงสูงสุด ' + QR_MAX + ' ป้ายต่อครั้ง)' : '');
+  qr_print.disabled = !names.length;
+}
+function qrFillAll() {
+  var seen = Object.create(null), list = [];
+  data.forEach(function (e) { var v = normSp(e.site), k = v.toLowerCase(); if (v && !seen[k]) { seen[k] = 1; list.push(v); } });
+  list.sort(function (a, b) { return a.localeCompare(b, 'th', { numeric: true }); });
+  qr_sites.value = list.join('\n'); renderQr();
+}
+function printQr() {
+  document.body.classList.add('qr-print');
+  var done = function () { document.body.classList.remove('qr-print'); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  window.print();
+  setTimeout(done, 1500);       // กันกรณีเบราว์เซอร์ไม่ยิง afterprint (ไม่ให้หน้าเว็บค้างในโหมดพิมพ์ป้าย)
 }
 
 /* ============ ชื่อมาตรฐาน (กันสะสมชื่อซ้ำที่สะกด/ตัวพิมพ์ต่างกัน) ============ */
@@ -954,6 +1838,7 @@ function save() {
     if (n > MAX_BATCH) { alert('สร้างได้ครั้งละไม่เกิน ' + MAX_BATCH + ' รายการ (ตอนนี้ ' + n + ' รายการ) — ลดจำนวน site หรือช่วงวันที่ลง'); return; }
     if (!n) { alert('ไม่มีรายการใหม่ให้สร้าง — ทุกคู่ site+วันที่ มีอยู่แล้ว'); return; }
     if (n >= 10 && !confirm('จะสร้าง ' + n + ' รายการ (' + plan.sites.length + ' site × ' + plan.dates.length + ' วัน)' + (plan.skipped ? ' และข้าม ' + plan.skipped + ' รายการที่ซ้ำ' : '') + '\nยืนยันไหม?')) return;
+    saveMem(row);   // จำค่าล่าสุด (หัวหน้าทีม/โปรเจกต์/เวลา/ประเภท/จำนวนทีม) ไว้เติมให้ครั้งหน้า
     var ids = makeIds(n);
     var rows = plan.combos.map(function (c, i) {
       var rr = {};
@@ -1099,7 +1984,48 @@ function expCSV() {
 }
 
 /* ============ เริ่มทำงาน + ซิงก์อัตโนมัติ (เรียกหลังล็อกอินสำเร็จเท่านั้น) ============ */
+/* ผูกตัวจับว่า "ผู้ใช้แก้ช่องไหนเอง" (การตั้งค่าด้วยโค้ดไม่นับ) และเติมจาก site เมื่อพิมพ์/เลือกชื่อ site ที่มีอยู่ */
+['f_proj', 'f_lead', 'f_in', 'f_out', 'f_num', 'f_type'].forEach(function (id) {
+  var el = document.getElementById(id), h = function () { formTouched[id] = 1; };
+  el.addEventListener('input', h); el.addEventListener('change', h);
+});
+function gridCell(e) {
+  var el = e.target; if (!el || !el.getAttribute || el.getAttribute('data-c') === null) return null;
+  return { el: el, r: +el.getAttribute('data-r'), c: +el.getAttribute('data-c') };
+}
+gridTb.addEventListener('input', function (e) { var x = gridCell(e); if (!x) return; gridRows[x.r][GCOLS[x.c].k] = x.el.value; gridValidate(); });
+gridTb.addEventListener('change', function (e) { var x = gridCell(e); if (!x) return; gridRows[x.r][GCOLS[x.c].k] = x.el.value; gridValidate(); });
+gridTb.addEventListener('focusout', function (e) {
+  var x = gridCell(e); if (!x) return; var k = GCOLS[x.c].k;
+  if (k === 'date' || k === 'tin' || k === 'tout' || k === 'num') {
+    var v = gnorm(k, x.el.value);
+    if (v !== x.el.value) { x.el.value = v; gridRows[x.r][k] = v; gridValidate(); }
+  }
+});
+gridTb.addEventListener('keydown', function (e) {
+  var x = gridCell(e); if (!x) return;
+  if (e.key === 'Enter' && x.el.tagName !== 'SELECT') { e.preventDefault(); gridEnter(x.r, x.c); }
+  else if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D') && x.r > 0) {
+    e.preventDefault(); var k = GCOLS[x.c].k, v = gridRows[x.r - 1][k];
+    gridRows[x.r][k] = v; x.el.value = v; gridValidate();
+  }
+});
+gridTb.addEventListener('paste', function (e) {
+  var x = gridCell(e); if (!x) return;
+  var t = (e.clipboardData || window.clipboardData).getData('text');
+  if (!/[\t\n\r]/.test(t)) return;     // วางข้อความช่องเดียว: ให้เบราว์เซอร์วางตามปกติ
+  e.preventDefault(); gridPaste(x.r, x.c, t);
+});
+['f_type', 'f_status'].forEach(function (id) { document.getElementById(id).addEventListener('change', syncChips); });
+['f_in', 'f_out'].forEach(function (id) { document.getElementById(id).addEventListener('input', syncChips); });
+renderFormChips();
+pendingLink = readDeepLink();
+if (pendingLink) { try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} }   // ล้าง ?site=... ออกจาก URL กันรีเฟรชแล้วเปิดซ้ำ
+f_site.addEventListener('input', autofillFromSite);
+f_site.addEventListener('change', autofillFromSite);
+
 function initApp() {
+  if (pendingLink) setTimeout(function () { if (pendingLink) { var lk = pendingLink; pendingLink = null; openDeepLink(lk); } }, 4000);   // สัญญาณอ่อนโหลดข้อมูลไม่ทัน: เปิดฟอร์มให้อยู่ดี (เติมจากครั้งล่าสุดไม่ได้)
   document.getElementById('meLabel').textContent = ME;
   document.getElementById('meAvatar').textContent = (ME || '?').charAt(0).toUpperCase();
   draw();
